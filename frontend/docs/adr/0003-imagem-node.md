@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Decisão
 - Dockerfile multi-stage (`deps`, `dev`, `builder`, `runtime`) em `node:24-slim`.

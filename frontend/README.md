@@ -11,7 +11,7 @@ App **Next.js** (servidor padrão, usado como SPA) com duas áreas:
 
 > 📚 Documentação completa: [`docs/`](./docs/README.md) · Branch/commit/MR: [CONTRIBUTING.md](./CONTRIBUTING.md) · Templates de MR: [`.gitlab/`](./.gitlab/merge_request_templates)
 >
-> ⚠️ **Status (CPBS-275):** fase de documentação. Os comandos abaixo descrevem o funcionamento **alvo** e passam a valer quando a implementação for concluída.
+> ⚠️ **Status:** fase de documentação. Os comandos abaixo descrevem o funcionamento **alvo** e passam a valer quando a implementação for concluída.
 
 ## O sistema
 

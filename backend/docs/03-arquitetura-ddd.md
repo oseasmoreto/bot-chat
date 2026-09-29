@@ -67,4 +67,4 @@ forbidden_modules = ["fastapi", "pydantic", "starlette"]
 | **I** — Interface Segregation | Ports pequenas e específicas (`ClockPort.now()`), nada de "god interfaces" |
 | **D** — Dependency Inversion | Caso de uso depende de `Protocol`, não de classes concretas; concreto injetado no composition root |
 | **DRY** | `build_health_router(scope)` gera o mesmo router para `public` e `admin`; `BaseSchema` centraliza a config camelCase |
-| **KISS** | Sem framework de DI, sem ORM, sem event bus nesta fase — um `Container` dataclass resolve |
+| **KISS** | Sem framework de DI, sem ORM, sem event bus enquanto não forem necessários — um `Container` dataclass resolve |

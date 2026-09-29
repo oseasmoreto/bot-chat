@@ -39,7 +39,7 @@ flowchart LR
 | `hotfix/*` | `master` | Hotfix | merge commit | Hotfix |
 | `master` → `staging` → `developer` | — | Back-merge pós-hotfix | merge commit | Release |
 
-- Branch de trabalho: `<tipo>/CPBS-<numero>-<descricao>` (ex.: `feat/CPBS-275-fundacao-projeto`), criada da `developer` (hotfix: da `master`).
+- Branch de trabalho: `<tipo>/CPBS-<numero>-<descricao>` (ex.: `feat/CPBS-123-health-check`), criada da `developer` (hotfix: da `master`).
 - Bug encontrado em staging → `fix/*` na `developer` e nova promoção; nunca commit direto em `staging`/`master`.
 - Passo a passo de promoção e hotfix: §1.6 e §1.7 do guia de cada projeto.
 

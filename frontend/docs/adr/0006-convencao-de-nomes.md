@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Decisão
 - camelCase em funções, métodos e variáveis; PascalCase em componentes e tipos; `use` + PascalCase em hooks; UPPER_SNAKE_CASE em constantes de módulo.

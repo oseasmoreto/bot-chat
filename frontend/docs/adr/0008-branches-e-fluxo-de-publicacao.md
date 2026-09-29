@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 O time precisa de ambientes separados de desenvolvimento, homologação e produção, com controle explícito do que chega a cada um e rastreabilidade de cada mudança até o ticket.

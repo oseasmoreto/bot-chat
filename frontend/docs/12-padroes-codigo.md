@@ -2,7 +2,7 @@
 
 ## Nomenclatura: camelCase
 
-A orientação da task é **camelCase para métodos**: no TypeScript é o padrão da linguagem e vale para funções, métodos e variáveis. O contrato da API também é camelCase (o backend converte do Python), então os tipos gerados já chegam em camelCase ([ADR-0006](./adr/0006-convencao-de-nomes.md)).
+A orientação do projeto é **camelCase para métodos**: no TypeScript é o padrão da linguagem e vale para funções, métodos e variáveis. O contrato da API também é camelCase (o backend converte do Python), então os tipos gerados já chegam em camelCase ([ADR-0006](./adr/0006-convencao-de-nomes.md)).
 
 
 ## Tabela de nomenclatura

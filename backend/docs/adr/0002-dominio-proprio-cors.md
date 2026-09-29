@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 O frontend (`app.<dominio>`) chama a API (`api.<dominio>`) diretamente do navegador: são origens diferentes.

@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 O frontend roda em imagem `node:24` própria, em domínio próprio (`app.<dominio>`), e precisa ter comportamento de **SPA**, consumindo a API em outro domínio.

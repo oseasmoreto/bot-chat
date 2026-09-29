@@ -39,10 +39,10 @@ gitGraph
     commit id: "release anterior" tag: "backend-v0.1.0"
     branch staging
     branch developer
-    branch feat/CPBS-275-health
+    branch feat/CPBS-123-health
     commit id: "feat(backend): health"
     checkout developer
-    merge feat/CPBS-275-health id: "merge MR 1"
+    merge feat/CPBS-123-health id: "merge MR 1"
     branch fix/CPBS-301-ajuste
     commit id: "fix(backend): cors"
     checkout developer
@@ -85,8 +85,8 @@ Qualquer combinação fora desta tabela é **bloqueada pelo CI** (`scripts/check
 | Parte | Regra | Exemplo |
 |-------|-------|---------|
 | `tipo` | Um dos tipos da tabela abaixo | `feat` |
-| `TICKET` | Chave do Jira, **obrigatória**, em maiúsculas | `CPBS-275` |
-| `descricao-curta` | 2 a 5 palavras, kebab-case, minúsculas, sem acentos | `fundacao-projeto` |
+| `TICKET` | Chave do Jira, **obrigatória**, em maiúsculas | `CPBS-123` |
+| `descricao-curta` | 2 a 5 palavras, kebab-case, minúsculas, sem acentos | `health-check` |
 | Tamanho total | Máximo 60 caracteres | — |
 
 Regex validada no hook local e no CI (as permanentes `developer`, `staging` e `master` são aceitas à parte):
@@ -108,8 +108,8 @@ Regex validada no hook local e no CI (as permanentes `developer`, `staging` e `m
 | `ci` | Pipeline | `developer` | `developer` |
 | `chore` | Manutenção geral | `developer` | `developer` |
 
-✅ `feat/CPBS-275-fundacao-projeto` · ✅ `hotfix/CPBS-290-ws-timeout`
-❌ `feature/fundacao` (tipo inválido, sem ticket) · ❌ `feat/cpbs-275-Fundação` (ticket minúsculo, maiúscula, acento) · ❌ `fulano/teste` (sem padrão)
+✅ `feat/CPBS-123-health-check` · ✅ `hotfix/CPBS-290-ws-timeout`
+❌ `feature/fundacao` (tipo inválido, sem ticket) · ❌ `feat/cpbs-123-Saúde` (ticket minúsculo, maiúscula, acento) · ❌ `fulano/teste` (sem padrão)
 
 ### 1.5 Regras de vida da branch de trabalho
 
@@ -233,7 +233,7 @@ feat(backend): adiciona health check por escopo
 Expõe GET /api/v1/{public,admin}/health usando o mesmo caso de uso,
 para que o frontend valide a comunicação ponta a ponta.
 
-Refs: CPBS-275
+Refs: CPBS-123
 ```
 
 ```text
@@ -252,7 +252,7 @@ Refs: CPBS-340
 ```text
 test(backend): cobre rejeição de origem no handshake websocket
 
-Refs: CPBS-275
+Refs: CPBS-123
 ```
 
 ✅ Título de MR de promoção (não precisa de `Refs`):
@@ -458,7 +458,7 @@ fi
 
 echo "✖ Nome de branch inválido: '$branch'" >&2
 echo "  Esperado: <tipo>/CPBS-<numero>-<descricao-em-kebab-case> (máx. $max_length caracteres)" >&2
-echo "  Exemplo:  feat/CPBS-275-fundacao-projeto" >&2
+echo "  Exemplo:  feat/CPBS-123-health-check" >&2
 echo "  Ver: CONTRIBUTING.md §1.4" >&2
 exit 1
 ```

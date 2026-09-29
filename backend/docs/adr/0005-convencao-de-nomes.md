@@ -2,10 +2,9 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
-A orientação da task é usar **camelCase para métodos**. No Python, a PEP 8 define `snake_case` para funções/métodos, e o ecossistema (stdlib, FastAPI, Pydantic) e o linter (`ruff`, regra `N802`) seguem isso.
+A orientação do projeto é usar **camelCase para métodos**. No Python, a PEP 8 define `snake_case` para funções/métodos, e o ecossistema (stdlib, FastAPI, Pydantic) e o linter (`ruff`, regra `N802`) seguem isso.
 
 ## Decisão
 - **Python:** PEP 8 (`snake_case` em funções/métodos, `PascalCase` em classes).

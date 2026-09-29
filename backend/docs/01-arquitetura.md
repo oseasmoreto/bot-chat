@@ -40,7 +40,7 @@ flowchart LR
 
 | Elemento | Responsabilidade |
 |----------|------------------|
-| Load balancer / ingress | TLS, domínio, balanceamento. Fora do escopo desta task (plataforma) |
+| Load balancer / ingress | TLS, domínio, balanceamento — responsabilidade da plataforma de deploy |
 | Uvicorn + FastAPI | REST (`/api/v1/*`), WebSocket (`/api/v1/ws/*`), OpenAPI/Swagger, CORS, validação de `Origin` |
 
 **Um processo por container.** Detalhes em [08 — Docker e deploy](./08-docker-deploy.md).
@@ -136,7 +136,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    health["health ✅<br/>(CPBS-275)"]
+    health["health<br/>(primeiro context)"]
     conv["conversation<br/>sessões e mensagens de chat"]
     flows["flows<br/>construção/execução de fluxos"]
     integ["integrations<br/>conectores de parceiros"]

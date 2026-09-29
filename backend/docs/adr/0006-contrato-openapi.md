@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 Front e back são projetos separados; o front precisa de tipos confiáveis sem escrevê-los à mão.

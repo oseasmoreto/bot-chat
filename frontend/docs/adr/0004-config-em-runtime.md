@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 A URL da API muda por ambiente (`localhost:8000`, `api.<dominio>`…). Variáveis `NEXT_PUBLIC_*` são embutidas no JavaScript durante o build.

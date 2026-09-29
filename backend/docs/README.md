@@ -1,6 +1,6 @@
 # Documentação — Backend
 
-> Projeto `backend/` do Bot Varejo · Task de origem: **CPBS-275**
+> Projeto `backend/` do Bot Varejo
 > Frontend: `docs/README.md` no repositório do **frontend** · Branch/commit/MR: [CONTRIBUTING.md](../CONTRIBUTING.md) · Templates de MR: [`.gitlab/merge_request_templates/`](../.gitlab/merge_request_templates)
 
 API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio (`api.<dominio>`), para os escopos `public` e `admin`.
@@ -9,7 +9,7 @@ API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio 
 
 | # | Documento | Conteúdo |
 |---|-----------|----------|
-| 00 | [Visão geral e escopo](./00-visao-geral.md) | Contexto, stack, critérios de aceitação, fora de escopo |
+| 00 | [Visão geral](./00-visao-geral.md) | Contexto, stack, princípios |
 | 01 | [Arquitetura](./01-arquitetura.md) | Contexto do sistema, containers, rotas, fluxos HTTP/WS, evolução |
 | 02 | [Estrutura de pastas](./02-estrutura.md) | Árvore do projeto e arquivos gerados |
 | 03 | [Arquitetura DDD](./03-arquitetura-ddd.md) | Bounded contexts, camadas, regra de dependência, SOLID/DRY/KISS |
@@ -21,10 +21,11 @@ API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio 
 | 09 | [Testes](./09-testes.md) | TDD, matriz obrigatória, exemplos (unitário, rota, CORS, WS, contrato, smoke) |
 | 10 | [Padrões de código](./10-padroes-codigo.md) | Nomenclatura, convenções de API, tipagem, lint, `pyproject.toml` |
 | 11 | [CI e comandos](./11-ci.md) | Pipeline por ambiente (developer, staging, master), deploy, Makefile |
+| — | [Tarefas](./tasks/README.md) | Objetivo, critérios de aceitação e escopo de cada tarefa |
 | — | [ADRs](./adr/README.md) | Decisões de arquitetura do backend |
 | — | [Glossário](./glossario.md) | Termos de negócio e técnicos |
 
-## Endpoints desta fase (CPBS-275)
+## Endpoints
 
 | Tipo | Path | Escopo |
 |------|------|--------|

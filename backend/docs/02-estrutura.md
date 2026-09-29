@@ -7,7 +7,7 @@ backend/
 ├── README.md                    # passo a passo para rodar localmente
 ├── CONTRIBUTING.md              # branches, commits, MRs, versionamento, validações
 ├── .gitmessage                  # template de mensagem de commit
-├── docs/                        # esta documentação (+ adr/)
+├── docs/                        # esta documentação (+ adr/, tasks/)
 ├── pyproject.toml               # dependências e config de ruff, mypy, pytest, coverage, import-linter
 ├── uv.lock
 ├── .python-version              # 3.13

@@ -7,7 +7,7 @@ frontend/
 ├── README.md                       # passo a passo para rodar localmente
 ├── CONTRIBUTING.md                 # branches, commits, MRs, versionamento, validações
 ├── .gitmessage                     # template de mensagem de commit
-├── docs/                           # esta documentação (+ adr/)
+├── docs/                           # esta documentação (+ adr/, tasks/)
 ├── package.json                    # scripts: dev, build, start, test, e2e, lint, typecheck, openapi
 ├── pnpm-lock.yaml
 ├── .nvmrc                          # 24

@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 A API tem domínio próprio (`api.<dominio>`) e só expõe REST e WebSocket: não há arquivos estáticos para servir. TLS e domínio são tratados pela plataforma de deploy (load balancer/ingress).

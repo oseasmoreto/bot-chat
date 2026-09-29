@@ -2,7 +2,7 @@
 
 ## Nomenclatura: Python × contrato
 
-A orientação da task é **camelCase para métodos**. No backend aplicamos assim ([ADR-0005](./adr/0005-convencao-de-nomes.md)):
+A orientação do projeto é **camelCase para métodos**. No backend aplicamos assim ([ADR-0005](./adr/0005-convencao-de-nomes.md)):
 
 - **Código Python:** segue a **PEP 8** (`snake_case` em funções/métodos), padrão da linguagem e exigido pelo `ruff` (regra `N802`). camelCase no Python iria contra FastAPI, Pydantic e a stdlib.
 - **Contrato (JSON da API, mensagens WS, operationId):** **camelCase**. A conversão é automática via `BaseSchema` — o frontend só enxerga camelCase.

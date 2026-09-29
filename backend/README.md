@@ -4,7 +4,7 @@ API REST + WebSocket do Bot Varejo: **Python 3.13 · FastAPI · async · WebSock
 
 > 📚 Documentação completa: [`docs/`](./docs/README.md) · Branch/commit/MR: [CONTRIBUTING.md](./CONTRIBUTING.md) · Templates de MR: [`.gitlab/`](./.gitlab/merge_request_templates)
 >
-> ⚠️ **Status (CPBS-275):** fase de documentação. Os comandos abaixo descrevem o funcionamento **alvo** e passam a valer quando a implementação for concluída.
+> ⚠️ **Status:** fase de documentação. Os comandos abaixo descrevem o funcionamento **alvo** e passam a valer quando a implementação for concluída.
 
 ## O sistema
 

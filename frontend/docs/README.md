@@ -1,6 +1,6 @@
 # Documentação — Frontend
 
-> Projeto `frontend/` do Bot Varejo · Task de origem: **CPBS-275**
+> Projeto `frontend/` do Bot Varejo
 > Backend: `docs/README.md` no repositório do **backend** · Branch/commit/MR: [CONTRIBUTING.md](../CONTRIBUTING.md) · Templates de MR: [`.gitlab/merge_request_templates/`](../.gitlab/merge_request_templates)
 
 Um único app **Next.js** (servidor padrão, usado como SPA) servido em `app.<dominio>`, com duas áreas: **web** em `/` (cliente final, escopo `public`) e **admin** em `/admin` (operação, escopo `admin`). Consome a API em outro domínio (`api.<dominio>`).
@@ -9,7 +9,7 @@ Um único app **Next.js** (servidor padrão, usado como SPA) servido em `app.<do
 
 | # | Documento | Conteúdo |
 |---|-----------|----------|
-| 00 | [Visão geral e escopo](./00-visao-geral.md) | Contexto, áreas, stack, critérios de aceitação |
+| 00 | [Visão geral](./00-visao-geral.md) | Contexto, áreas, stack, princípios |
 | 01 | [Arquitetura](./01-arquitetura.md) | Contexto do sistema, containers, rotas, fluxos |
 | 02 | [Estrutura de pastas](./02-estrutura.md) | Árvore do projeto, onde colocar código novo |
 | 03 | [Next.js como SPA](./03-nextjs-spa.md) | Regras do modo SPA, `next.config.ts`, layout raiz, `/healthz` |
@@ -23,10 +23,11 @@ Um único app **Next.js** (servidor padrão, usado como SPA) servido em `app.<do
 | 11 | [Testes](./11-testes.md) | TDD, matriz obrigatória, infraestrutura, exemplos, E2E |
 | 12 | [Padrões de código](./12-padroes-codigo.md) | Nomenclatura camelCase, tipagem, boas práticas, lint |
 | 13 | [CI e comandos](./13-ci.md) | Pipeline por ambiente (developer, staging, master), E2E, deploy, scripts, Makefile |
+| — | [Tarefas](./tasks/README.md) | Objetivo, critérios de aceitação e escopo de cada tarefa |
 | — | [ADRs](./adr/README.md) | Decisões de arquitetura do frontend |
 | — | [Glossário](./glossario.md) | Termos de negócio e técnicos |
 
-## Telas desta fase (CPBS-275)
+## Telas
 
 | Área | Rota | Descrição |
 |------|------|-----------|

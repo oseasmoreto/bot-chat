@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Decisão
 - Um endpoint por escopo: `/api/v1/ws/public`, `/api/v1/ws/admin`.
@@ -15,5 +14,5 @@
 - **Um endpoint WS por funcionalidade:** multiplica conexões no cliente.
 
 ## Consequências
-- Nova mensagem = novo handler + teste + linha na tabela de [06](../06-contratos-api.md#mensagens-da-cpbs-275).
+- Nova mensagem = novo handler + teste + linha na tabela de [06](../06-contratos-api.md#mensagens).
 - Escala horizontal com estado exigirá pub/sub (futuro ADR).

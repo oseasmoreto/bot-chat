@@ -10,7 +10,7 @@
 
 | Rota | Arquivo | Compõe | Descrição |
 |------|---------|--------|-----------|
-| `/` | `src/app/(web)/page.tsx` | `WebShell` | Página inicial (placeholder nesta fase, com link para o status) |
+| `/` | `src/app/(web)/page.tsx` | `WebShell` | Página inicial (placeholder, com link para o status) |
 | `/health` | `src/app/(web)/health/page.tsx` | `HealthStatusCard scope="public"` | Status da API (escopo public) via HTTP e WebSocket |
 | qualquer outra | `src/app/not-found.tsx` | — | Página 404 |
 
@@ -33,7 +33,7 @@ export default function WebLayout({ children }: { children: ReactNode }) {
 
 | Feature | Local | Status | Descrição |
 |---------|-------|--------|-----------|
-| `health` | `src/features/health/` (comum) | CPBS-275 | `GET /api/v1/public/health` + `health.ping` em `/api/v1/ws/public` |
+| `health` | `src/features/health/` (comum) | atual | `GET /api/v1/public/health` + `health.ping` em `/api/v1/ws/public` |
 | `chat` | `src/areas/web/features/chat/` | futuro | Conversa com o bot em tempo real |
 
 ## Pontos de atenção

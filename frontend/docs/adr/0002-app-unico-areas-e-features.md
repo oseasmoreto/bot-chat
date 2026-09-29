@@ -2,7 +2,6 @@
 
 - **Status:** Aceito
 - **Data:** 2026-09-29
-- **Ticket:** CPBS-275
 
 ## Contexto
 O frontend atende dois públicos — cliente final (**web**) e operação (**admin**) — num único domínio. Requisitos: modularidade, componentização e poder mexer numa feature (ou numa área) sem afetar as demais.
