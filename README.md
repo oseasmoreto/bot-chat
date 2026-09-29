@@ -2,146 +2,78 @@
 
 Plataforma de atendimento, via chat, de serviços de parceiros de varejo.
 
-| Parte | Stack | Pasta |
-|-------|-------|-------|
-| API | Python 3.13 · FastAPI · async · WebSockets | [`backend/`](./backend) |
-| Front público | Next.js SPA · React · TypeScript · Tailwind | [`web/`](./web) |
-| Front admin | Next.js SPA · React · TypeScript · Tailwind | [`admin/`](./admin) |
-| Pacotes compartilhados | UI kit, cliente HTTP/WS tipados, configs | [`packages/`](./packages) |
-| Roteamento / estáticos | Nginx | [`infra/nginx/`](./infra/nginx) |
-| Empacotamento | Docker (imagem única) + Docker Compose | [`infra/docker/`](./infra/docker) |
+Este repositório contém **dois projetos independentes**. Cada um tem seu próprio README, CONTRIBUTING, `.gitmessage`, documentação, ADRs, templates de MR, Dockerfile, docker compose, Makefile e pipeline.
 
-> 📚 **Documentação completa:** [`docs/`](./docs/README.md) — arquitetura, diagramas, estrutura de pastas, padrões, testes e ADRs.
-> Por parte: [backend](./docs/backend/README.md) · [web](./docs/web/README.md) · [admin](./docs/admin/README.md) · [frontend comum](./docs/frontend-comum/README.md)
->
-> ⚠️ **Status (CPBS-275):** fase de documentação. Os comandos abaixo descrevem o funcionamento **alvo** da fundação e passam a valer quando a implementação for concluída.
+| Projeto | Stack | Domínio | Imagem | Documentação |
+|---------|-------|---------|--------|--------------|
+| [**backend/**](./backend/README.md) | Python 3.13 · FastAPI · async · WebSockets | `api.<dominio>` | `python:3.13-slim` | [backend/docs](./backend/docs/README.md) |
+| [**frontend/**](./frontend/README.md) | Node 24 · Next.js (SPA) · React · TypeScript · Tailwind | `app.<dominio>` | `node:24-slim` | [frontend/docs](./frontend/docs/README.md) |
 
-## Arquitetura em 30 segundos
+> ⚠️ **Status (CPBS-275):** fase de documentação. Os comandos descrevem o funcionamento **alvo**.
+
+## Visão geral
 
 ```mermaid
 flowchart LR
-    b["Navegador"] -->|":8080"| n["Nginx"]
-    subgraph img["Imagem Docker única"]
-        n -->|"/"| w["web (estático)"]
-        n -->|"/admin"| a["admin (estático)"]
-        n -->|"/api  /ws"| api["FastAPI (Uvicorn)"]
+    u["👤 Cliente final"] -->|"app.&lt;dominio&gt;/"| f
+    o["👤 Operador"] -->|"app.&lt;dominio&gt;/admin"| f
+    subgraph front["frontend/ — container Node 24"]
+        f["Next.js<br/>web em / · admin em /admin"]
     end
+    subgraph back["backend/ — container Python 3.13"]
+        a["FastAPI + Uvicorn<br/>/api/v1/public · /api/v1/admin · /api/v1/ws/*"]
+    end
+    f -. "navegador chama a API direto<br/>HTTPS + WSS (CORS)" .-> a
 ```
 
-## Pré-requisitos
+- Cada projeto roda **um processo por container**; TLS e domínios ficam na plataforma de deploy.
+- A única ligação entre os projetos é o **contrato HTTP/WebSocket** ([backend/docs/06-contratos-api.md](./backend/docs/06-contratos-api.md)).
 
-| Ferramenta | Versão | Para quê |
-|------------|--------|----------|
-| Docker + Docker Compose v2 | Compose ≥ 2.24 | Rodar a aplicação |
-| Node.js | 24 LTS (ver `.nvmrc`) | Desenvolver os frontends |
-| pnpm | via `corepack enable` | Workspaces do front |
-| Python | 3.13 (ver `.python-version`) | Desenvolver o backend |
-| uv | última estável | Dependências Python |
-| make | qualquer | Atalhos |
-
-> Para **apenas rodar** a aplicação, basta Docker.
-
-## Rodando localmente
-
-### Opção 1 — Aplicação completa (imagem única, igual à produção)
+## Rodando tudo localmente
 
 ```bash
-# 1. Clonar o repositório
-git clone <url-do-repo> bot-varejo && cd bot-varejo
+# terminal 1 — API em http://localhost:8000
+cd backend && docker compose up --build
 
-# 2. (Opcional) configurar variáveis
-cp .env.example .env
-
-# 3. Subir
-docker compose up --build        # ou: make up
+# terminal 2 — front em http://localhost:3000
+cd frontend && docker compose up --build
 ```
 
-Acesse:
+Acesse http://localhost:3000/health (web) e http://localhost:3000/admin/health (admin). Detalhes e alternativas sem Docker nos READMEs de cada projeto.
 
-| URL | O quê |
-|-----|-------|
-| http://localhost:8080/ | Front público (web) |
-| http://localhost:8080/health/ | Tela de status do web |
-| http://localhost:8080/admin/ | Front admin |
-| http://localhost:8080/admin/health/ | Tela de status do admin |
-| http://localhost:8080/api/docs | Swagger |
-| http://localhost:8080/api/openapi.json | OpenAPI |
-| http://localhost:8080/api/v1/public/health | Health (public) |
-| http://localhost:8080/api/v1/admin/health | Health (admin) |
+## Estrutura do repositório
 
-Verificação rápida pelo terminal:
-
-```bash
-curl -s http://localhost:8080/api/v1/public/health
-# {"status":"ok","scope":"public","version":"0.1.0","uptimeSeconds":3.2,"checkedAt":"…","components":[]}
-
-curl -s http://localhost:8080/api/v1/admin/health
-# {"status":"ok","scope":"admin",…}
+```text
+bot-varejo/
+├── README.md                 # este arquivo
+├── CONTRIBUTING.md           # padrão de branches, commits, MRs e versionamento
+├── .gitmessage               # template de mensagem de commit
+├── .gitlab-ci.yml            # orquestra: valida o MR e inclui o CI de cada projeto
+├── commitlint.config.mjs     # regras de commit (a criar na implementação)
+├── .pre-commit-config.yaml   # hooks de commit/push e lint por projeto (a criar)
+├── scripts/
+│   └── check-branch-name.sh  # validação do nome da branch (a criar)
+├── backend/                  # projeto backend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose, CI
+└── frontend/                 # projeto frontend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose, CI
 ```
-
-Testar o WebSocket (com [websocat](https://github.com/vi/websocat) ou pelo console do navegador):
-
-```bash
-echo '{"type":"health.ping","id":"1","payload":{}}' | websocat ws://localhost:8080/ws/public
-# {"type":"health.pong","id":"1","payload":{"status":"ok","scope":"public",…}}
-```
-
-Parar: `docker compose down` (ou `make down`).
-
-### Opção 2 — Desenvolvimento com hot reload
-
-```bash
-cp .env.example .env
-docker compose -f docker-compose.dev.yml up --build     # ou: make dev
-```
-
-Mesmas URLs (`http://localhost:8080`). Alterações em `backend/src`, `web/src`, `admin/src` e `packages/*/src` recarregam automaticamente.
-
-### Rodando testes, lint e tipos (na máquina)
-
-```bash
-make setup        # uv sync + pnpm install + hooks do pre-commit + template de commit
-make lint         # ruff, eslint, prettier, import-linter
-make typecheck    # mypy --strict, tsc
-make test         # pytest + vitest
-make e2e          # Playwright contra docker compose
-make openapi      # regenera o cliente TS após mudar a API
-```
-
-Sem `make`? Os comandos equivalentes estão em [docs/07 §3](./docs/07-fluxo-trabalho-ci.md#3-makefile--atalhos-padronizados), [docs/backend](./docs/backend/README.md#comandos) e [docs/frontend-comum](./docs/frontend-comum/README.md#comandos).
-
-## Variáveis de ambiente
-
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `APP_ENV` | `local` | Ambiente |
-| `APP_VERSION` | `0.1.0` | Versão exibida no health/OpenAPI |
-| `APP_LOG_LEVEL` | `INFO` | Nível de log |
-| `APP_DOCS_ENABLED` | `true` | Habilita Swagger/OpenAPI |
-| `HTTP_PORT` | `8080` | Porta publicada no host |
-
-## Solução de problemas
-
-| Sintoma | Causa provável | Solução |
-|---------|----------------|---------|
-| `port is already allocated` | Porta 8080 em uso | `HTTP_PORT=8081 docker compose up` |
-| `/admin` abre o web | Build antigo em cache | `docker compose build --no-cache` |
-| WebSocket não conecta no dev | Nginx dev sem headers de upgrade | Conferir `infra/nginx/snippets/proxy-ws.conf` |
-| Front mostra tipos desatualizados | `openapi.json` antigo | `make openapi` |
-| Mudança em `package.json`/`pyproject.toml` não aparece no dev | Dependências instaladas no build da imagem | Subir de novo com `--build` |
 
 ## Contribuindo
 
-Leia [docs/08 — Branches, commits e merge requests](./docs/08-branches-commits-mr.md), [docs/06 — Padrões gerais de código](./docs/06-padroes-gerais.md), [docs/05 — Estratégia de testes](./docs/05-estrategia-testes.md) e [docs/07 — Fluxo de trabalho e CI](./docs/07-fluxo-trabalho-ci.md).
-
-Resumo:
+Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Cada projeto tem também o seu guia completo: [backend/CONTRIBUTING.md](./backend/CONTRIBUTING.md) · [frontend/CONTRIBUTING.md](./frontend/CONTRIBUTING.md). Resumo:
 
 ```text
-branch:  feat/CPBS-123-descricao-curta
-commit:  feat(backend): adiciona health check por escopo
-         (linha em branco)
-         Refs: CPBS-123
-MR:      título = cabeçalho do commit · template do GitLab · ≥ 1 aprovação · pipeline verde · squash
+branches:  developer (development) → staging (homologação) → master (production) — todas protegidas
+branch:    feat/CPBS-123-descricao-curta  (sai da developer)
+commit:    feat(backend): adiciona health check por escopo   ← escopos: backend | frontend, web, admin | ci, deps, repo | release
+           (linha em branco)
+           Refs: CPBS-123
+MR:        → developer · merge commit (sem squash) · um projeto por MR · template do projeto · pipeline verde
+publicar:  MRs de promoção developer → staging → master (template Release)
+tags:      backend-vX.Y.Z · frontend-vX.Y.Z (na master)
 ```
 
-TDD, toda rota/feature/tela com teste. Templates de MR em [`.gitlab/merge_request_templates/`](./.gitlab/merge_request_templates).
+## Templates de merge request
+
+Cada projeto tem os seus, em `<projeto>/.gitlab/merge_request_templates/` (Default, Bugfix, Hotfix, Docs).
+
+> ⚠️ O GitLab só oferece no seletor os templates que estão em `.gitlab/merge_request_templates/` **na raiz do repositório**. Neste repositório, copie o conteúdo do template do projeto para a descrição do MR.
