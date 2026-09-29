@@ -1,0 +1,15 @@
+
+# ┌─ Cabeçalho (obrigatório, máx. 72 caracteres) ─────────────────────────────
+# <tipo>(<escopo>): <descrição em pt-BR, minúscula, sem ponto final>
+#   ex.: feat(backend): adiciona health check por escopo
+#
+# ┌─ Corpo (opcional, linhas até 100 caracteres) ─────────────────────────────
+# Explique POR QUE a mudança foi feita (o diff já mostra o quê).
+#
+# ┌─ Rodapé (obrigatório) ────────────────────────────────────────────────────
+# Refs: CPBS-<numero>
+# BREAKING CHANGE: <o que quebra e como migrar>   (só se houver; use "!" no cabeçalho)
+#
+# Tipos:   feat fix perf refactor test docs style build ci chore revert
+# Escopos: backend web admin ui api-client ws-client config infra docs deps repo
+# Guia:    docs/08-branches-commits-mr.md
