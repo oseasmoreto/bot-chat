@@ -6,7 +6,7 @@ Este repositório contém **dois projetos independentes**. Cada um tem seu próp
 
 | Projeto | Stack | Domínio | Imagem | Documentação |
 |---------|-------|---------|--------|--------------|
-| [**backend/**](./backend/README.md) | Python 3.13 · FastAPI · async · WebSockets | `api.<dominio>` | `python:3.13-slim` | [backend/docs](./backend/docs/README.md) |
+| [**backend/**](./backend/README.md) | Python 3.13 · FastAPI · async · WebSockets · DynamoDB | `api.<dominio>` | `python:3.13-slim` | [backend/docs](./backend/docs/README.md) |
 | [**frontend/**](./frontend/README.md) | Node 24 · Next.js (SPA) · React · TypeScript · Tailwind | `app.<dominio>` | `node:24-slim` | [frontend/docs](./frontend/docs/README.md) |
 
 > ⚠️ **Status:** fase de documentação. Os comandos descrevem o funcionamento **alvo**.

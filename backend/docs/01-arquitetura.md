@@ -36,12 +36,14 @@ flowchart LR
         uv["Uvicorn :8000<br/>FastAPI app"]
     end
     browser -->|"HTTPS / WSS"| lb -->|"HTTP / WS"| uv
+    uv -->|"aioboto3 (HTTPS)"| ddb[("Amazon DynamoDB<br/>uma tabela por context")]
 ```
 
 | Elemento | Responsabilidade |
 |----------|------------------|
 | Load balancer / ingress | TLS, domínio, balanceamento — responsabilidade da plataforma de deploy |
 | Uvicorn + FastAPI | REST (`/api/v1/*`), WebSocket (`/api/v1/ws/*`), OpenAPI/Swagger, CORS, validação de `Origin` |
+| Amazon DynamoDB | Persistência — uma tabela por bounded context ([12 — Persistência](./12-persistencia-dynamodb.md)) |
 
 **Um processo por container.** Detalhes em [08 — Docker e deploy](./08-docker-deploy.md).
 
@@ -149,4 +151,4 @@ flowchart LR
     iam -.-> partners
 ```
 
-Cada um será um pacote em `src/bot_varejo/contexts/<nome>/` com as mesmas quatro camadas. Com mais de uma réplica e WebSocket com estado (chat), será necessário *pub/sub* (ex.: Redis) — decisão futura em ADR.
+Cada um será um pacote em `src/bot_varejo/contexts/<nome>/` com as mesmas quatro camadas e, quando persistir dados, **a sua própria tabela no DynamoDB**. Com mais de uma réplica e WebSocket com estado (chat), será necessário *pub/sub* (ex.: Redis) — decisão futura em ADR.

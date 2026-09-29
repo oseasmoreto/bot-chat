@@ -82,7 +82,7 @@ class ClockPort(Protocol):
 
 
 class HealthCheckPort(Protocol):
-    """Verificação de uma dependência (ex.: banco, cache, API de parceiro)."""
+    """Verificação de uma dependência (ex.: DynamoDB, API de parceiro)."""
 
     @property
     def name(self) -> str: ...
@@ -230,7 +230,7 @@ def build_container(settings: Settings) -> Container:
     get_health = GetHealthUseCase(
         clock=SystemClock(),
         app_info=AppInfo(version=settings.version, started_at=datetime.now(UTC)),
-        checks=(),  # futuros: DatabaseHealthCheck(...), PartnerApiHealthCheck(...)
+        checks=(),  # futuros: DynamoDbHealthCheck(...) (docs/12), PartnerApiHealthCheck(...)
     )
     dispatcher = MessageDispatcher()
     dispatcher.register("health.ping", HealthPingHandler(get_health))

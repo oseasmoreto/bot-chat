@@ -36,6 +36,7 @@
 
 - [ ] Sem variáveis novas
 - [ ] Variáveis novas/alteradas já configuradas no ambiente: <!-- APP_*, APP_CORS_ORIGINS… -->
+- [ ] Tabelas/índices novos do DynamoDB já criados no ambiente (IaC aplicada): <!-- quais -->
 
 ## ✅ Validação
 

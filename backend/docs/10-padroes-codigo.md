@@ -48,7 +48,7 @@ A orientação do projeto é **camelCase para métodos**. No backend aplicamos a
 | Classe | PascalCase | `GetHealthUseCase`, `HealthReport` |
 | Caso de uso | `<Verbo><Substantivo>UseCase` | `GetHealthUseCase` |
 | Port (Protocol) | `<Nome>Port` | `ClockPort` |
-| Adapter | nome da tecnologia/implementação | `SystemClock`, `PostgresPartnerRepository` |
+| Adapter | nome da tecnologia/implementação | `SystemClock`, `DynamoDbPartnerRepository` |
 | Schema de saída | `<Nome>Response` | `HealthResponse` |
 | Schema de entrada | `<Nome>Request` | `CreateFlowRequest` |
 | Constante | UPPER_SNAKE_CASE | `STARTED_AT` |

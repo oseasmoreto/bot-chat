@@ -32,7 +32,7 @@ flowchart TB
 |--------|---------------|-------------------|----------|
 | `domain` | stdlib, `core.scope` | FastAPI, Pydantic, `application`, `infrastructure`, `presentation` | Entidades, value objects, regras de negócio, *ports* (`typing.Protocol`) |
 | `application` | `domain`, `core` | FastAPI, `infrastructure`, `presentation` | Casos de uso: orquestram domínio + ports. Uma classe = um caso de uso |
-| `infrastructure` | `domain`, `core`, libs externas | `presentation` | Implementações concretas das ports (relógio, banco, HTTP de parceiros…) |
+| `infrastructure` | `domain`, `core`, libs externas | `presentation` | Implementações concretas das ports (relógio, repositórios DynamoDB, HTTP de parceiros…) |
 | `presentation` | `application`, `domain`, `core`, FastAPI | `infrastructure` diretamente | Routers, schemas de entrada/saída, handlers WS, conversão domínio ⇄ DTO |
 | `api/` | `presentation` de todos os contexts | — | Agrupa routers por escopo (`public`/`admin`) e define prefixos |
 | `main.py` / `container.py` | tudo | — | **Composition root**: instancia adapters e injeta nos casos de uso |
@@ -51,10 +51,10 @@ containers = ["bot_varejo.contexts.health"]
 layers = ["presentation", "application", "domain"]
 
 [[tool.importlinter.contracts]]
-name = "Domínio não depende de frameworks"
+name = "Domínio não depende de frameworks nem de AWS"
 type = "forbidden"
 source_modules = ["bot_varejo.contexts.health.domain"]
-forbidden_modules = ["fastapi", "pydantic", "starlette"]
+forbidden_modules = ["fastapi", "pydantic", "starlette", "aioboto3", "boto3", "botocore"]
 ```
 
 ## Aplicação de SOLID, DRY, KISS

@@ -1,6 +1,6 @@
 # Bot Varejo — Backend
 
-API REST + WebSocket do Bot Varejo: **Python 3.13 · FastAPI · async · WebSockets**. Atende os escopos `public` (cliente final) e `admin` (operação), consumidos pelo **frontend** (repositório próprio) em outro domínio.
+API REST + WebSocket do Bot Varejo: **Python 3.13 · FastAPI · async · WebSockets · DynamoDB**. Atende os escopos `public` (cliente final) e `admin` (operação), consumidos pelo **frontend** (repositório próprio) em outro domínio.
 
 > 📚 Documentação completa: [`docs/`](./docs/README.md) · Branch/commit/MR: [CONTRIBUTING.md](./CONTRIBUTING.md) · Templates de MR: [`.gitlab/`](./.gitlab/merge_request_templates)
 >
@@ -100,6 +100,9 @@ make openapi      # atualiza openapi.json após mudar a API
 | `APP_CORS_ORIGINS` | `["http://localhost:3000"]` | Origens do frontend (JSON) — CORS e WebSocket |
 | `FORWARDED_ALLOW_IPS` | `127.0.0.1` | Proxies confiáveis (`X-Forwarded-*`) |
 | `API_PORT` | `8000` | Porta publicada no host |
+| `APP_AWS_REGION` | `sa-east-1` | Região do DynamoDB |
+| `APP_DYNAMODB_ENDPOINT_URL` | `http://dynamodb:8000` (local) | DynamoDB Local; vazio na AWS |
+| `APP_DYNAMODB_TABLE_PREFIX` | `bot-varejo-local` | Prefixo das tabelas |
 
 ## Solução de problemas
 

@@ -114,6 +114,8 @@ services:
 ```
 
 > Mudou `pyproject.toml`/`uv.lock`? Suba de novo com `--build`.
+>
+> Os dois arquivos de compose incluem o serviço `dynamodb` (DynamoDB Local) quando houver persistência — definição e variáveis em [12 — Persistência](./12-persistencia-dynamodb.md#7-ambiente-local).
 
 ### Rodando junto com o frontend
 
@@ -135,6 +137,7 @@ O frontend também pode subir a API a partir da imagem publicada no registry (pr
 | Porta | Onde | Exposta no host? |
 |-------|------|------------------|
 | 8000 | Uvicorn (runtime e dev) | ✅ (`API_PORT`) |
+| 8001 | DynamoDB Local (compose; porta 8000 dentro da rede do compose) | ✅ (`DYNAMODB_PORT`) |
 
 ## 4. Variáveis de ambiente
 
@@ -149,6 +152,11 @@ Documentadas também em `.env.example`.
 | `APP_CORS_ORIGINS` | `["http://localhost:3000"]` | Origens do frontend (JSON). Vale para CORS e para o `Origin` do WebSocket |
 | `FORWARDED_ALLOW_IPS` | `127.0.0.1` | IPs de proxy confiáveis para `X-Forwarded-*` (lido pelo Uvicorn) |
 | `API_PORT` | `8000` | Porta publicada no host (compose) |
+| `APP_AWS_REGION` | `sa-east-1` | Região do DynamoDB ([12](./12-persistencia-dynamodb.md#6-configuração)) |
+| `APP_DYNAMODB_ENDPOINT_URL` | `http://dynamodb:8000` (local) | Endpoint do DynamoDB Local; vazio na AWS |
+| `APP_DYNAMODB_TABLE_PREFIX` | `bot-varejo-local` | Prefixo das tabelas (`<prefixo>-<context>`) |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | `local` (só local) | Na AWS, credenciais vêm da role IAM |
+| `DYNAMODB_PORT` | `8001` | Porta do DynamoDB Local no host (compose) |
 
 ## 5. Entrega por ambiente
 

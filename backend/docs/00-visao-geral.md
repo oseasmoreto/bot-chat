@@ -24,6 +24,7 @@ O backend atende dois **escopos**:
 | Framework | FastAPI (async) + Uvicorn |
 | Tempo real | WebSockets (Starlette/FastAPI) |
 | Validação / schemas | Pydantic v2, pydantic-settings |
+| Banco de dados | Amazon DynamoDB — uma tabela por bounded context, acesso async com aioboto3; DynamoDB Local em dev/testes |
 | Dependências | uv |
 | Qualidade | ruff, mypy `--strict`, import-linter |
 | Testes | pytest, pytest-asyncio, httpx |

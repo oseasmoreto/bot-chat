@@ -354,6 +354,7 @@ Criar no projeto do GitLab (Manage → Labels):
 - [ ] Toda rota HTTP e mensagem WebSocket nova/alterada tem teste de integração; casos de uso com teste unitário.
 - [ ] Contrato mudou? `openapi.json` e [Contratos de API](./docs/06-contratos-api.md) atualizados; mudança **retrocompatível** (ou `/api/v2`); frontend avisado (ticket/MR).
 - [ ] CORS / `Origin` do WebSocket continuam restritos a `APP_CORS_ORIGINS`.
+- [ ] Persistência (DynamoDB): cada context só acessa a própria tabela; consultas por chave/índice (sem `Scan`); escritas com condição/`version`; padrões de acesso documentados ([12](./docs/12-persistencia-dynamodb.md)).
 - [ ] Documentação (`docs/`) e ADR atualizados quando necessário.
 - [ ] Sem segredos, logs de debug, código comentado ou TODO sem ticket.
 

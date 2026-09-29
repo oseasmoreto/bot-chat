@@ -38,6 +38,7 @@ backend/
 │       │       ├── __init__.py
 │       │       ├── messages.py  # envelope WsMessage (type, id, payload)
 │       │       └── dispatcher.py# MessageDispatcher: registra handlers por "type"
+│       │   └── dynamodb/        # acesso ao DynamoDB (ver docs/12): resource, tables, codecs, paginação, health
 │       ├── api/                 # composição por escopo (agrega routers dos contexts)
 │       │   ├── __init__.py
 │       │   ├── public.py        # APIRouter prefix=/api/v1/public
@@ -65,7 +66,8 @@ backend/
 │       │           ├── http.py            # build_health_router(scope)
 │       │           └── ws_handlers.py     # handler de "health.ping"
 │       └── scripts/
-│           └── export_openapi.py          # gera openapi.json (make openapi)
+│           ├── export_openapi.py          # gera openapi.json (make openapi)
+│           └── create_tables.py           # cria as tabelas no DynamoDB Local (make db-init)
 └── tests/
     ├── __init__.py
     ├── conftest.py              # fixtures: app, client async, ws client, ALLOWED_ORIGIN

@@ -66,7 +66,7 @@ Regras do status HTTP do health:
 | `version` | `string` | sim | Versão da aplicação (`APP_VERSION`) |
 | `uptimeSeconds` | `number` | sim | Segundos desde o start do processo |
 | `checkedAt` | `string` (date-time) | sim | Momento da verificação (UTC) |
-| `components` | `ComponentHealth[]` | sim | Dependências verificadas (ex.: banco). Vazio enquanto não houver dependências externas |
+| `components` | `ComponentHealth[]` | sim | Dependências verificadas (ex.: `database` — DynamoDB). Vazio enquanto não houver dependências externas |
 
 `ComponentHealth`:
 

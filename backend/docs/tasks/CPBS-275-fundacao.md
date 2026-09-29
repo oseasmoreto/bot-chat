@@ -36,7 +36,7 @@ Criar a **fundação da API**: estrutura, padrões, empacotamento Docker e um *h
 
 ## Fora de escopo
 
-- Banco de dados e persistência.
+- Implementação da persistência. O banco já está definido e documentado: DynamoDB ([ADR-0009](../adr/0009-dynamodb.md), [12 — Persistência](../12-persistencia-dynamodb.md)).
 - Armazenamento de arquivos.
 - Autenticação/autorização (o escopo `admin` **ainda não** é protegido).
 - Motor de fluxos de conversa e integrações com parceiros.

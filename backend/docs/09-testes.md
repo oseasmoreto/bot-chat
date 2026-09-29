@@ -28,7 +28,7 @@ flowchart TB
 |----------|---------------|-----------|-------------|
 | Entidade / value object | Unitário | pytest | ✅ |
 | Caso de uso | Unitário com *fakes* das ports | pytest + pytest-asyncio | ✅ |
-| Adapter de infraestrutura | Integração com o recurso real (ou container) | pytest | ✅ |
+| Adapter de infraestrutura | Integração com o recurso real — repositórios contra o **DynamoDB Local** ([12](./12-persistencia-dynamodb.md#8-testes)) | pytest | ✅ |
 | **Rota HTTP** | Integração: status, schema, erros | pytest + httpx `AsyncClient` | ✅ **toda rota** |
 | **Mensagem WebSocket** | Integração: request → response, erros, `Origin` | Starlette `TestClient` | ✅ **todo `type`** |
 | CORS | Integração: origem permitida e negada | pytest + httpx | ✅ |

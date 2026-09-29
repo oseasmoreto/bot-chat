@@ -21,6 +21,7 @@ API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio 
 | 09 | [Testes](./09-testes.md) | TDD, matriz obrigatória, exemplos (unitário, rota, CORS, WS, contrato, smoke) |
 | 10 | [Padrões de código](./10-padroes-codigo.md) | Nomenclatura, convenções de API, tipagem, lint, `pyproject.toml` |
 | 11 | [CI e comandos](./11-ci.md) | Pipeline por ambiente (developer, staging, master), deploy, Makefile |
+| 12 | [Persistência (DynamoDB)](./12-persistencia-dynamodb.md) | Tabela por context, chaves e índices, repositórios, config, ambiente local, testes |
 | — | [Tarefas](./tasks/README.md) | Objetivo, critérios de aceitação e escopo de cada tarefa |
 | — | [ADRs](./adr/README.md) | Decisões de arquitetura do backend |
 | — | [Glossário](./glossario.md) | Termos de negócio e técnicos |

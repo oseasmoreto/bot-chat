@@ -12,5 +12,6 @@ Decisões de arquitetura do **backend**. Formato: Contexto, Decisão, Alternativ
 | [0006](./0006-contrato-openapi.md) | Contrato via OpenAPI gerado, versionado e publicado | Aceito |
 | [0007](./0007-protocolo-websocket.md) | Protocolo WebSocket com envelope type/id/payload | Aceito |
 | [0008](./0008-branches-e-fluxo-de-publicacao.md) | Branches `developer`, `staging`, `master` e fluxo de publicação | Aceito |
+| [0009](./0009-dynamodb.md) | Amazon DynamoDB como banco de dados | Aceito |
 
 ADRs do frontend: `docs/adr/README.md` no repositório do **frontend**.
