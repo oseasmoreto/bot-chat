@@ -1,0 +1,29 @@
+# Dependências de runtime — vão para a imagem de produção.
+# Versões sempre fixadas (==). Atualização = MR `build(deps): ...` com os testes verdes.
+
+# --- API (HTTP + WebSocket) ------------------------------------------------------
+fastapi==0.137.1
+starlette==1.3.1
+# [standard] traz websockets, httptools, uvloop e watchfiles (--reload)
+uvicorn[standard]==0.27.1
+pydantic==2.11.3
+pydantic-settings==2.14.2
+# Leitura do .env pelo pydantic-settings
+python-dotenv==1.2.2
+
+# --- Upload de arquivos ------------------------------------------------------------
+# Formulários multipart (UploadFile) no FastAPI
+python-multipart==0.0.32
+# Tipo real do arquivo pelos bytes, sem confiar na extensão
+filetype==1.2.0
+
+# --- Chamadas HTTP de saída (parceiros, integrações) --------------------------------
+httpx==0.28.1
+tenacity==9.1.2
+
+# --- DynamoDB (docs/12-persistencia-dynamodb.md) -----------------------------------
+# Traz aiobotocore e boto3/botocore compatíveis entre si
+aioboto3==15.0.0
+
+# --- Dependências transitivas fixadas por segurança ----------------------------------
+urllib3==2.7.0

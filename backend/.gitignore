@@ -5,7 +5,7 @@ __pycache__/
 build/
 dist/
 
-# --- Ambiente virtual (uv) -------------------------------------------------------
+# --- Ambiente virtual (pip) -------------------------------------------------------
 .venv/
 
 # --- Ferramentas de qualidade e testes -------------------------------------------
@@ -36,4 +36,4 @@ shared-local-instance.db
 .DS_Store
 Thumbs.db
 
-# Versionados de propósito (não ignorar): uv.lock, openapi.json
+# Versionados de propósito (não ignorar): requirements*.txt, openapi.json

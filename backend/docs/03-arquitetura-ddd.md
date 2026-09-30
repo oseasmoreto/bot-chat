@@ -15,9 +15,9 @@ flowchart TB
         P --> A --> D
         I -. "implementa ports" .-> D
     end
-    core["core/ (shared kernel)<br/>config, logging, errors, Scope, BaseSchema, WS dispatcher"]
-    api["api/ (composição por escopo)<br/>public.py, admin.py, websocket.py"]
-    main["main.py + container.py<br/>(composition root)"]
+    core["core/ (shared kernel)<br/>cors, swagger, logs, errors, request_id, Scope, BaseSchema, WS dispatcher"]
+    api["routes/ (composição por escopo)<br/>public.py, admin.py, websocket.py"]
+    main["app_run.py + container.py<br/>(composition root)"]
 
     api --> P
     main --> api
@@ -30,31 +30,52 @@ flowchart TB
 
 | Camada | Pode importar | Não pode importar | Conteúdo |
 |--------|---------------|-------------------|----------|
-| `domain` | stdlib, `core.scope` | FastAPI, Pydantic, `application`, `infrastructure`, `presentation` | Entidades, value objects, regras de negócio, *ports* (`typing.Protocol`) |
-| `application` | `domain`, `core` | FastAPI, `infrastructure`, `presentation` | Casos de uso: orquestram domínio + ports. Uma classe = um caso de uso |
+| `domain` | stdlib, `core.scope`, `core.exceptions` | FastAPI, Pydantic, Starlette, boto/aioboto3, httpx, tenacity, `application`, `infrastructure`, `presentation` | Entidades, value objects, regras de negócio, *ports* (`typing.Protocol`) |
+| `application` | `domain`, `core` | FastAPI, Starlette, boto/aioboto3, httpx, `infrastructure`, `presentation` | Casos de uso: orquestram domínio + ports. Uma classe = um caso de uso |
 | `infrastructure` | `domain`, `core`, libs externas | `presentation` | Implementações concretas das ports (relógio, repositórios DynamoDB, HTTP de parceiros…) |
 | `presentation` | `application`, `domain`, `core`, FastAPI | `infrastructure` diretamente | Routers, schemas de entrada/saída, handlers WS, conversão domínio ⇄ DTO |
-| `api/` | `presentation` de todos os contexts | — | Agrupa routers por escopo (`public`/`admin`) e define prefixos |
-| `main.py` / `container.py` | tudo | — | **Composition root**: instancia adapters e injeta nos casos de uso |
+| `routes/` | `presentation` de todos os contexts | — | Agrupa routers por escopo (`public`/`admin`) e define prefixos |
+| `app_run.py` / `container.py` | tudo | — | **Composition root**: instancia adapters e injeta nos casos de uso |
 
-Essas fronteiras serão verificadas automaticamente com **import-linter** (contratos em `pyproject.toml`) no CI.
+Essas fronteiras são verificadas pelo **import-linter** (`lint-imports`, contratos em `pyproject.toml`) localmente e no CI. Os contratos usam `api.contexts.*`: todo context novo é coberto sem editar o `pyproject.toml`, e precisa ter as quatro camadas. Um context também não importa código de outro context.
 
 ```toml
 # pyproject.toml (trecho)
 [tool.importlinter]
-root_package = "bot_varejo"
+root_packages = ["api"]
+include_external_packages = true   # necessário para proibir fastapi/pydantic/boto no domínio
 
 [[tool.importlinter.contracts]]
 name = "Camadas de cada context"
 type = "layers"
-containers = ["bot_varejo.contexts.health"]
+containers = ["api.contexts.*"]            # todo context novo entra sozinho
 layers = ["presentation", "application", "domain"]
+
+[[tool.importlinter.contracts]]
+name = "Presentation não importa infrastructure diretamente (só via container)"
+type = "forbidden"
+source_modules = ["api.contexts.*.presentation"]
+forbidden_modules = ["api.contexts.*.infrastructure"]
+allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
 name = "Domínio não depende de frameworks nem de AWS"
 type = "forbidden"
-source_modules = ["bot_varejo.contexts.health.domain"]
-forbidden_modules = ["fastapi", "pydantic", "starlette", "aioboto3", "boto3", "botocore"]
+source_modules = ["api.contexts.*.domain"]
+forbidden_modules = [
+    "fastapi", "pydantic", "starlette", "aioboto3", "boto3", "botocore", "httpx", "tenacity",
+]
+
+[[tool.importlinter.contracts]]
+name = "Casos de uso não dependem de framework web, AWS nem HTTP (usam as ports)"
+type = "forbidden"
+source_modules = ["api.contexts.*.application"]
+forbidden_modules = ["fastapi", "starlette", "aioboto3", "boto3", "botocore", "httpx"]
+
+[[tool.importlinter.contracts]]
+name = "Contexts independentes entre si"
+type = "independence"
+modules = ["api.contexts.*"]
 ```
 
 ## Aplicação de SOLID, DRY, KISS

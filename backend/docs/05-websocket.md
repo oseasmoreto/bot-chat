@@ -28,12 +28,13 @@ from typing import Any
 
 from pydantic import Field
 
-from bot_varejo.core.schemas import BaseSchema
+from api.core.schemas import BaseSchema
 
 
 class WsMessage(BaseSchema):
     type: str
     id: str | None = None
+    # Any só na fronteira: cada handler valida o próprio payload.
     payload: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -46,8 +47,8 @@ def ws_error(code: str, message: str, *, request_id: str | None = None) -> WsMes
 ```python
 from collections.abc import Awaitable, Callable
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.core.websocket.messages import WsMessage, ws_error
+from api.core.scope import Scope
+from api.core.websocket.messages import WsMessage, ws_error
 
 WsHandler = Callable[[WsMessage, Scope], Awaitable[WsMessage]]
 
@@ -75,10 +76,10 @@ class MessageDispatcher:
 ## `contexts/health/presentation/ws_handlers.py`
 
 ```python
-from bot_varejo.core.scope import Scope
-from bot_varejo.core.websocket.messages import WsMessage
-from bot_varejo.contexts.health.application.get_health import GetHealthUseCase
-from bot_varejo.contexts.health.presentation.schemas import HealthResponse
+from api.contexts.health.application.get_health import GetHealthUseCase
+from api.contexts.health.presentation.schemas import HealthResponse
+from api.core.scope import Scope
+from api.core.websocket.messages import WsMessage
 
 
 class HealthPingHandler:
@@ -94,7 +95,7 @@ class HealthPingHandler:
         )
 ```
 
-## `api/websocket.py`
+## `routes/websocket.py`
 
 ```python
 import logging
@@ -103,9 +104,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status
 from pydantic import ValidationError
 
-from bot_varejo.container import Container, get_container
-from bot_varejo.core.scope import Scope
-from bot_varejo.core.websocket.messages import WsMessage, ws_error
+from api.container import Container, get_container
+from api.core.scope import Scope
+from api.core.websocket.messages import WsMessage, ws_error
 
 logger = logging.getLogger(__name__)
 ws_router = APIRouter()

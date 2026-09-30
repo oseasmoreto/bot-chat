@@ -137,6 +137,7 @@ Códigos de erro WS:
 |--------|--------|
 | `invalid_message` | Texto não é JSON ou não respeita o envelope |
 | `unknown_message_type` | Não há handler registrado para `type` |
+| `invalid_payload` | O `payload` não respeita o schema da mensagem (validado pelo handler) |
 
 ### Exemplo de sessão
 

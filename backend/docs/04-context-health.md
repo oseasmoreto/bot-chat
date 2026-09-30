@@ -47,8 +47,8 @@ _SEVERITY: Final[dict[HealthStatus, int]] = {
 from dataclasses import dataclass
 from datetime import datetime
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.domain.value_objects import HealthStatus
+from api.core.scope import Scope
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -74,7 +74,7 @@ class HealthReport:
 from datetime import datetime
 from typing import Protocol
 
-from bot_varejo.contexts.health.domain.entities import ComponentHealth
+from api.contexts.health.domain.entities import ComponentHealth
 
 
 class ClockPort(Protocol):
@@ -98,10 +98,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.domain.entities import HealthReport
-from bot_varejo.contexts.health.domain.ports import ClockPort, HealthCheckPort
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.domain.entities import HealthReport
+from api.contexts.health.domain.ports import ClockPort, HealthCheckPort
+from api.contexts.health.domain.value_objects import HealthStatus
+from api.core.scope import Scope
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,10 +169,10 @@ class BaseSchema(BaseModel):
 from datetime import datetime
 from typing import Self
 
-from bot_varejo.core.schemas import BaseSchema
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.domain.entities import HealthReport
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.domain.entities import HealthReport
+from api.contexts.health.domain.value_objects import HealthStatus
+from api.core.schemas import BaseSchema
+from api.core.scope import Scope
 
 
 class ComponentHealthResponse(BaseSchema):
@@ -212,11 +212,11 @@ from datetime import UTC, datetime
 
 from fastapi.requests import HTTPConnection
 
-from bot_varejo.core.config import Settings
-from bot_varejo.core.websocket.dispatcher import MessageDispatcher
-from bot_varejo.contexts.health.application.get_health import AppInfo, GetHealthUseCase
-from bot_varejo.contexts.health.infrastructure.system_clock import SystemClock
-from bot_varejo.contexts.health.presentation.ws_handlers import HealthPingHandler
+from api.config import Settings
+from api.contexts.health.application.get_health import AppInfo, GetHealthUseCase
+from api.contexts.health.infrastructure.system_clock import SystemClock
+from api.contexts.health.presentation.ws_handlers import HealthPingHandler
+from api.core.websocket.dispatcher import MessageDispatcher
 
 
 @dataclass(frozen=True, slots=True)
@@ -250,8 +250,8 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from bot_varejo.container import Container, get_container
-from bot_varejo.contexts.health.application.get_health import GetHealthUseCase
+from api.container import Container, get_container
+from api.contexts.health.application.get_health import GetHealthUseCase
 
 
 def get_health_use_case(
@@ -269,11 +269,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, status
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.application.get_health import GetHealthUseCase
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
-from bot_varejo.contexts.health.presentation.dependencies import get_health_use_case
-from bot_varejo.contexts.health.presentation.schemas import HealthResponse
+from api.contexts.health.application.get_health import GetHealthUseCase
+from api.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.presentation.dependencies import get_health_use_case
+from api.contexts.health.presentation.schemas import HealthResponse
+from api.core.scope import Scope
 
 
 def build_health_router(scope: Scope) -> APIRouter:
@@ -297,68 +297,58 @@ def build_health_router(scope: Scope) -> APIRouter:
     return router
 ```
 
-## `api/public.py` e `api/admin.py`
+## `routes/public.py` e `routes/admin.py`
 
 ```python
-# api/public.py
+# routes/public.py
 from fastapi import APIRouter
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.presentation.http import build_health_router
+from api.contexts.health.presentation.http import build_health_router
+from api.core.scope import Scope
 
 public_router = APIRouter(prefix="/api/v1/public", tags=["public"])
 public_router.include_router(build_health_router(Scope.PUBLIC))
 ```
 
 ```python
-# api/admin.py
+# routes/admin.py
 from fastapi import APIRouter
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.presentation.http import build_health_router
+from api.contexts.health.presentation.http import build_health_router
+from api.core.scope import Scope
 
+# Futuro: dependencies=[Depends(require_admin)] quando o context identity existir.
 admin_router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 admin_router.include_router(build_health_router(Scope.ADMIN))
-# Futuro: dependencies=[Depends(require_admin)] quando o context identity existir.
 ```
 
-## `main.py`
+## `app_run.py`
 
 ```python
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-from bot_varejo.api.admin import admin_router
-from bot_varejo.api.public import public_router
-from bot_varejo.api.websocket import ws_router
-from bot_varejo.container import build_container
-from bot_varejo.core.config import Settings
-from bot_varejo.core.errors import register_error_handlers
-from bot_varejo.core.logging import configure_logging
+from api.config import Settings
+from api.container import build_container
+from api.core.cors import configure_cors
+from api.core.errors import register_error_handlers
+from api.core.logs import configure_logging
+from api.core.request_id import RequestIdMiddleware
+from api.core.swagger import docs_urls
+from api.routes.admin import admin_router
+from api.routes.public import public_router
+from api.routes.websocket import ws_router
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
     configure_logging(settings.log_level)
 
-    app = FastAPI(
-        title="Bot Varejo API",
-        version=settings.version,
-        docs_url="/api/docs" if settings.docs_enabled else None,
-        redoc_url="/api/redoc" if settings.docs_enabled else None,
-        openapi_url="/api/openapi.json" if settings.docs_enabled else None,
-    )
+    app = FastAPI(title="Bot Varejo API", version=settings.version, **docs_urls(settings))
     app.state.container = build_container(settings)
 
-    # Front e API em domínios diferentes → CORS explícito, só para origens conhecidas.
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["*"],
-        expose_headers=["X-Request-ID"],
-    )
+    configure_cors(app, settings)
+    # Adicionado por último = mais externo: até o preflight do CORS recebe X-Request-ID.
+    app.add_middleware(RequestIdMiddleware)
 
     app.include_router(public_router)
     app.include_router(admin_router)
@@ -367,9 +357,55 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 ```
 
-Execução: `uvicorn bot_varejo.main:create_app --factory --host 0.0.0.0 --port 8000`.
+Execução: `uvicorn api.app_run:create_app --factory --host 0.0.0.0 --port 8000`.
 
-## `core/config.py`
+## `core/cors.py`
+
+```python
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from api.config import Settings
+from api.core.request_id import REQUEST_ID_HEADER
+
+
+def configure_cors(app: FastAPI, settings: Settings) -> None:
+    """Front e API em domínios diferentes → CORS explícito, só para origens conhecidas.
+
+    A mesma lista (`APP_CORS_ORIGINS`) valida o Origin do WebSocket (routes/websocket.py).
+    """
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+        expose_headers=[REQUEST_ID_HEADER],
+    )
+```
+
+## `core/swagger.py`
+
+```python
+from typing import TypedDict
+
+from api.config import Settings
+
+
+class DocsUrls(TypedDict):
+    docs_url: str | None
+    redoc_url: str | None
+    openapi_url: str | None
+
+
+def docs_urls(settings: Settings) -> DocsUrls:
+    """URLs do Swagger, ReDoc e OpenAPI. `APP_DOCS_ENABLED=false` desliga as três."""
+    if not settings.docs_enabled:
+        return DocsUrls(docs_url=None, redoc_url=None, openapi_url=None)
+    return DocsUrls(docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json")
+```
+
+## `config.py`
 
 ```python
 from typing import Literal

@@ -6,9 +6,9 @@ Imagem própria do backend, baseada em **`python:3.13-slim`**, rodando **Uvicorn
 
 ```mermaid
 flowchart LR
-    base["base<br/>python:3.13-slim + uv"] --> dev["dev<br/>deps com grupo dev<br/>uvicorn --reload"]
-    base --> builder["builder<br/>uv sync --no-dev<br/>→ .venv com o pacote"]
-    builder -->|".venv"| runtime["runtime<br/>python:3.13-slim limpo<br/>usuário não-root · :8000"]
+    base["base<br/>python:3.13-slim"] --> dev["dev<br/>pip install -r requirements-test.txt<br/>uvicorn --reload"]
+    base --> builder["builder<br/>venv + pip install -r requirements.txt"]
+    builder -->|".venv"| runtime["runtime<br/>python:3.13-slim limpo<br/>.venv + api/ · usuário não-root · :8000"]
 ```
 
 ### `Dockerfile`
@@ -16,64 +16,62 @@ flowchart LR
 ```dockerfile
 # syntax=docker/dockerfile:1
 ARG PYTHON_VERSION=3.13
-ARG UV_VERSION=0.12.21
-
-# ---------- uv (binário fixado) --------------------------------------------------
-FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
 # ---------- base ---------------------------------------------------------------
 FROM python:${PYTHON_VERSION}-slim AS base
-COPY --from=uv /uv /uvx /bin/
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    UV_PYTHON_DOWNLOADS=never
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # ---------- dev (docker-compose.dev.yml) ---------------------------------------
 FROM base AS dev
-COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-install-project
-ENV PATH=/app/.venv/bin:$PATH \
-    PYTHONPATH=/app/src \
-    PYTHONUNBUFFERED=1 \
+COPY requirements.txt requirements-test.txt ./
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements-test.txt
+ENV PYTHONPATH=/app \
     PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000
-CMD ["uvicorn", "bot_varejo.main:create_app", "--factory", "--reload", "--reload-dir", "/app/src", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.app_run:create_app", "--factory", "--reload", "--reload-dir", "/app/api", "--host", "0.0.0.0", "--port", "8000"]
 
 # ---------- builder ------------------------------------------------------------
 FROM base AS builder
-COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-install-project
-COPY src ./src
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
+RUN python -m venv /app/.venv
+ENV PATH=/app/.venv/bin:$PATH
+COPY requirements.txt ./
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 
 # ---------- runtime (imagem final) ---------------------------------------------
 FROM python:${PYTHON_VERSION}-slim AS runtime
 ARG APP_VERSION=0.0.0-local
 ENV APP_VERSION=${APP_VERSION} \
     PATH=/app/.venv/bin:$PATH \
+    PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
     FORWARDED_ALLOW_IPS=127.0.0.1
 
 RUN useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
-COPY --from=builder --chown=app:app /app/.venv /app/.venv
+# Código e dependências ficam com dono root: o usuário da aplicação só lê.
+COPY --from=builder /app/.venv /app/.venv
+COPY api ./api
+RUN python -m compileall -q api
 
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/public/health', timeout=2)"]
-CMD ["uvicorn", "bot_varejo.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["uvicorn", "api.app_run:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
 ```
 
 Pontos importantes:
 
 - **Sem `curl`** na imagem: o HEALTHCHECK usa o próprio Python. `urlopen` falha em 503, então health `down` marca o container como *unhealthy*.
-- **Não-root** (`app`, uid 10001).
+- **Não-root** (`app`, uid 10001). Código (`api/`) e `.venv` ficam com dono root: a aplicação só lê. O bytecode é gerado no build (`compileall`).
+- Só `api/` e as dependências de runtime (`requirements.txt`) entram na imagem; testes e ferramentas de qualidade ficam no estágio `dev`.
+- Cache do pip montado no build (`--mount=type=cache`): rebuild só baixa o que mudou em `requirements*.txt`.
 - `--proxy-headers` + `FORWARDED_ALLOW_IPS`: o Uvicorn só confia em `X-Forwarded-*` vindos desses IPs. Em produção, configure com o IP/rede do load balancer (ou `*` se o container só for acessível pela rede privada).
 - **1 processo Uvicorn** por container; escalar = mais réplicas. WebSocket com estado entre réplicas exigirá *pub/sub* (futuro).
 - `.dockerignore`: `.venv`, caches, relatórios de teste, `docs/`, `tests/`, `.env*` (exceto `.env.example`) e os próprios arquivos Docker.
-- Versões fixadas: `uv` (argumento `UV_VERSION`) e `amazon/dynamodb-local` no compose.
+- Versões fixadas: dependências em `requirements*.txt` e `amazon/dynamodb-local` no compose.
 
 ## 2. Docker Compose
 
@@ -142,8 +140,8 @@ volumes:
 ### `docker-compose.dev.yml`
 
 ```yaml
-# Desenvolvimento local: API com --reload (src/ montado) + DynamoDB Local.
-# Alterações em src/ recarregam sozinhas. Só pyproject.toml/uv.lock/Dockerfile pedem --build.
+# Desenvolvimento local: API com --reload (api/ montado) + DynamoDB Local.
+# Alterações em api/ recarregam sozinhas. Só requirements*.txt/Dockerfile pedem --build.
 # Uso: docker compose -f docker-compose.dev.yml up --build
 name: bot-varejo-backend-dev
 
@@ -157,7 +155,7 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
-      - ./src:/app/src
+      - ./api:/app/api
     environment:
       APP_ENV: local
       APP_LOG_LEVEL: ${APP_LOG_LEVEL:-DEBUG}
@@ -189,7 +187,7 @@ volumes:
     name: bot-varejo-dynamodb-dev-data   # nome fixo, sem prefixo do projeto compose
 ```
 
-> **Reload sem subir de novo:** `src/` é montado no container e o Uvicorn (`--reload`, WatchFiles) reinicia sozinho a cada alteração — em ~2 s. `PYTHONDONTWRITEBYTECODE=1` evita `__pycache__` com dono root no projeto. Só mudanças em `pyproject.toml`, `uv.lock` ou `Dockerfile` pedem `docker compose -f docker-compose.dev.yml up --build`.
+> **Reload sem subir de novo:** `api/` é montado no container e o Uvicorn (`--reload`, WatchFiles) reinicia sozinho a cada alteração — em ~2 s. `PYTHONDONTWRITEBYTECODE=1` evita `__pycache__` com dono root no projeto. Só mudanças em `requirements.txt`, `requirements-test.txt` ou `Dockerfile` pedem `docker compose -f docker-compose.dev.yml up --build`.
 
 
 ### Rodando junto com o frontend

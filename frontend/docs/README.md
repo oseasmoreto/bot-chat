@@ -42,5 +42,5 @@ Um único app **Next.js** (servidor padrão, usado como SPA) servido em `app.<do
 1. Nova tela → tabela de telas da área ([05](./05-area-web.md) / [06](./06-area-admin.md)) e a tabela acima.
 2. Nova feature → tabela de features da área; se for comum às duas, citar nas duas.
 3. Contrato da API mudou → `pnpm openapi` e revisar [07](./07-integracao-api.md).
-4. Nova decisão → novo ADR (não edite ADR aceito; marque-o como *Substituído*).
+4. Nova decisão → novo ADR; decisão alterada → reescreva o ADR com a decisão vigente. A documentação descreve só o estado atual — histórico fica no git.
 5. Diagramas em **Mermaid**, versionados e revisados em MR como código.

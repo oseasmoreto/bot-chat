@@ -4,7 +4,7 @@
 |-------|-------|
 | Ticket | CPBS-275 |
 | Projeto | Backend |
-| Status | Documentação concluída · implementação pendente |
+| Status | Backend implementado · integração com o frontend pendente |
 
 ## Enunciado
 
@@ -13,6 +13,19 @@ Criar a fundação do Bot Varejo — plataforma de atendimento, via chat, de ser
 ## Objetivo neste projeto
 
 Criar a **fundação da API**: estrutura, padrões, empacotamento Docker e um *health check* por escopo, via HTTP e WebSocket, consumido pelo frontend em outro domínio.
+
+## Análise
+
+| # | Tema | Decisão | Origem |
+|---|------|---------|--------|
+| 1 | Estrutura | Código no pacote `api/` na raiz do projeto (`app_run.py`, `config.py`, `core/`, `routes/`, `contexts/`), testes em `tests/`; organização interna em DDD com bounded contexts | Resposta |
+| 2 | Pastas da plataforma | `config/` (deploy/infra) mantida sem alteração de estrutura; `certificates/` para certificados de CA | Resposta |
+| 3 | Dependências | pip com `requirements.txt` (runtime) e `requirements-test.txt` (testes e qualidade), versões fixadas | Resposta |
+| 4 | Libs de runtime | FastAPI, Starlette, Uvicorn, Pydantic, pydantic-settings, python-dotenv, httpx, tenacity, aioboto3 (DynamoDB), python-multipart e filetype (upload), urllib3 fixada | Resposta |
+| 5 | Libs fora desta entrega | LangChain/LangGraph, Twilio e Google Pub/Sub entram quando a funcionalidade que as usa for implementada | Resposta |
+| 6 | Banco | Amazon DynamoDB ([ADR-0009](../adr/0009-dynamodb.md)); acesso implementado com o primeiro context que persistir dados | Já definido |
+| 7 | Execução isolada | O compose do backend sobe só API + DynamoDB Local; nunca o frontend | Resposta |
+| 8 | IA | GitHub Copilot no VS Code com instruções, prompts e agente `backend-ddd` com fase de análise obrigatória ([14](../14-ia-copilot.md)) | Resposta |
 
 ## Critérios de aceitação
 
@@ -25,14 +38,14 @@ Criar a **fundação da API**: estrutura, padrões, empacotamento Docker e um *h
 
 ## Definição de pronto (DoD)
 
-- [ ] `docker compose up --build` sobe a API em `http://localhost:8000`.
-- [ ] `GET /api/v1/public/health` e `GET /api/v1/admin/health` retornam `200` com o schema documentado.
-- [ ] `ws://localhost:8000/api/v1/ws/public` e `/api/v1/ws/admin` respondem `health.ping` com `health.pong` (com `Origin` permitido).
-- [ ] CORS liberado apenas para as origens de `APP_CORS_ORIGINS`.
-- [ ] Swagger em `/api/docs` e OpenAPI em `/api/openapi.json`; `openapi.json` versionado e atualizado.
+- [x] `docker compose up --build` sobe a API em `http://localhost:8000`.
+- [x] `GET /api/v1/public/health` e `GET /api/v1/admin/health` retornam `200` com o schema documentado.
+- [x] `ws://localhost:8000/api/v1/ws/public` e `/api/v1/ws/admin` respondem `health.ping` com `health.pong` (com `Origin` permitido).
+- [x] CORS liberado apenas para as origens de `APP_CORS_ORIGINS`.
+- [x] Swagger em `/api/docs` e OpenAPI em `/api/openapi.json`; `openapi.json` versionado e atualizado.
 - [ ] O frontend (`http://localhost:3000`) consome o health dos dois escopos via HTTP e WebSocket.
-- [ ] Toda rota e mensagem WS com teste; cobertura ≥ 90%.
-- [ ] `ruff`, `mypy --strict` e `lint-imports` sem erros.
+- [x] Toda rota e mensagem WS com teste; cobertura ≥ 90%.
+- [x] `ruff`, `mypy --strict` e `lint-imports` sem erros.
 
 ## Fora de escopo
 
@@ -50,7 +63,7 @@ Criar a **fundação da API**: estrutura, padrões, empacotamento Docker e um *h
 | [ADR-0001](../adr/0001-imagem-python-uvicorn.md) | Imagem python:3.13-slim com Uvicorn |
 | [ADR-0002](../adr/0002-dominio-proprio-cors.md) | Domínio próprio, prefixo /api, CORS e Origin |
 | [ADR-0003](../adr/0003-ddd.md) | DDD com bounded contexts |
-| [ADR-0004](../adr/0004-uv.md) | uv |
+| [ADR-0004](../adr/0004-pip-requirements.md) | pip + requirements |
 | [ADR-0005](../adr/0005-convencao-de-nomes.md) | Convenção de nomes |
 | [ADR-0006](../adr/0006-contrato-openapi.md) | Contrato OpenAPI |
 | [ADR-0007](../adr/0007-protocolo-websocket.md) | Protocolo WebSocket |

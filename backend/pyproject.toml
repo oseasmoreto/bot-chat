@@ -1,0 +1,82 @@
+# Configuração das ferramentas. As dependências ficam em requirements.txt / requirements-test.txt.
+[project]
+name = "bot-varejo"
+version = "0.1.0"
+requires-python = ">=3.13"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ASYNC", "RUF", "ANN", "S", "PT", "PL"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "PLR0913", "PLR0917"]   # assert, números mágicos e fixtures
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]                 # `import api...` e `from tests.fakes import ...`
+addopts = "--strict-markers --strict-config"
+filterwarnings = [
+    "error",
+    # Aviso interno do Starlette com o anyio atual; não vem do nosso código.
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["api"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "class .*\\bProtocol\\):",    # ports: só assinaturas
+    "if __name__ == .__main__.:",
+]
+
+[tool.importlinter]
+root_packages = ["api"]
+include_external_packages = true   # necessário para proibir fastapi/pydantic/boto no domínio
+
+[[tool.importlinter.contracts]]
+name = "Camadas de cada context"
+type = "layers"
+containers = ["api.contexts.*"]            # todo context novo entra sozinho
+layers = ["presentation", "application", "domain"]
+
+[[tool.importlinter.contracts]]
+name = "Presentation não importa infrastructure diretamente (só via container)"
+type = "forbidden"
+source_modules = ["api.contexts.*.presentation"]
+forbidden_modules = ["api.contexts.*.infrastructure"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Domínio não depende de frameworks nem de AWS"
+type = "forbidden"
+source_modules = ["api.contexts.*.domain"]
+forbidden_modules = [
+    "fastapi", "pydantic", "starlette", "aioboto3", "boto3", "botocore", "httpx", "tenacity",
+]
+
+[[tool.importlinter.contracts]]
+name = "Casos de uso não dependem de framework web, AWS nem HTTP (usam as ports)"
+type = "forbidden"
+source_modules = ["api.contexts.*.application"]
+forbidden_modules = ["fastapi", "starlette", "aioboto3", "boto3", "botocore", "httpx"]
+
+[[tool.importlinter.contracts]]
+name = "Contexts independentes entre si"
+type = "independence"
+modules = ["api.contexts.*"]

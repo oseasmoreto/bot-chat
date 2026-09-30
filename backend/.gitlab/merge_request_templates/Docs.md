@@ -23,7 +23,7 @@ CPBS-
 
 - [ ] Nenhuma decisão nova
 - [ ] Novo ADR: <!-- ADR-NNNN — título — status -->
-- [ ] ADR substituído: <!-- ADR-NNNN → "Substituído por ADR-MMMM" -->
+- [ ] ADR atualizado com a decisão vigente: <!-- ADR-NNNN — o que mudou -->
 
 ## 🔗 Relação com código
 

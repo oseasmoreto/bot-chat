@@ -1,0 +1,18 @@
+# Dependências de desenvolvimento: testes e qualidade. Nunca vão para a imagem de produção.
+# Inclui as de runtime.
+-r requirements.txt
+
+# --- Testes ------------------------------------------------------------------------
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pytest-mock==3.15.1
+freezegun==1.5.3
+coverage==7.9.2
+# Cliente HTTP do TestClient do Starlette (testes de WebSocket); httpx segue nos testes async
+httpx2==2.13.1
+
+# --- Qualidade (lint, formatação, tipos, fronteiras DDD, hooks) ------------------------
+ruff==0.16.9
+mypy==2.3.1
+import-linter==2.15
+pre-commit==4.6.2

@@ -30,7 +30,7 @@ flowchart TB
 | Caso de uso | Unitário com *fakes* das ports | pytest + pytest-asyncio | ✅ |
 | Adapter de infraestrutura | Integração com o recurso real — repositórios contra o **DynamoDB Local** ([12](./12-persistencia-dynamodb.md#8-testes)) | pytest | ✅ |
 | **Rota HTTP** | Integração: status, schema, erros | pytest + httpx `AsyncClient` | ✅ **toda rota** |
-| **Mensagem WebSocket** | Integração: request → response, erros, `Origin` | Starlette `TestClient` | ✅ **todo `type`** |
+| **Mensagem WebSocket** | Integração: request → response, erros, `Origin` | Starlette `TestClient` (usa `httpx2`) | ✅ **todo `type`** |
 | CORS | Integração: origem permitida e negada | pytest + httpx | ✅ |
 | Contrato OpenAPI | `openapi.json` versionado = gerado | pytest | ✅ |
 | Imagem Docker | Smoke: container sobe e health responde 200 | CI (`docker run` + `curl`) | ✅ |
@@ -41,16 +41,18 @@ flowchart TB
 
 | Item | Regra |
 |------|-------|
-| Local | `tests/{unit,integration,contract}/` espelhando `src/` |
+| Local | `tests/{unit,integration,contract}/` espelhando `api/` |
 | Nome do arquivo | `test_<modulo>.py` |
 | Nome do teste | `test_<comportamento_esperado>_when_<condição>` |
 | Estrutura | Arrange / Act / Assert separados por linha em branco |
-| Dublês | *Fakes* que implementam as `Protocol` (sem `mock.patch` no domínio) — em `tests/fakes.py` |
+| Dublês | *Fakes* que implementam as `Protocol` (sem `mock.patch` no domínio) — em `tests/fakes.py`. `pytest-mock` (`mocker`) só na fronteira com libs externas |
+| Tempo | `freezegun` (`@freeze_time`) quando o código lê o relógio diretamente (ex.: logs); no domínio, `ClockPort` + `FakeClock` |
+| Avisos | `filterwarnings = error`: todo aviso (ex.: deprecação) quebra o teste |
 | Dados | Factories (`build_health_report(...)`) |
 
 ## 5. Cobertura mínima
 
-**90% de linhas** (global) — `[tool.coverage.report] fail_under = 90`. Cobertura é **piso**, não meta: a regra principal continua sendo "todo comportamento tem teste".
+**90%** (global, linhas e branches) — `coverage run -m pytest` + `coverage report` com `[tool.coverage.report] fail_under = 90`. Cobertura é **piso**, não meta: a regra principal continua sendo "todo comportamento tem teste".
 
 ## 6. Exemplos
 
@@ -61,8 +63,8 @@ flowchart TB
 # tests/fakes.py — dublês que implementam as ports (Protocol) do domínio
 from datetime import UTC, datetime
 
-from bot_varejo.contexts.health.domain.entities import ComponentHealth
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.domain.entities import ComponentHealth
+from api.contexts.health.domain.value_objects import HealthStatus
 
 STARTED_AT = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -93,15 +95,21 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 
-from bot_varejo.core.config import Settings
-from bot_varejo.main import create_app
+from api.app_run import create_app
+from api.config import Settings
 
 ALLOWED_ORIGIN = "http://localhost:3000"
 
 
 @pytest.fixture
-def app() -> FastAPI:
-    return create_app(Settings(env="local", version="test", cors_origins=[ALLOWED_ORIGIN]))
+def settings() -> Settings:
+    # _env_file=None: os testes não dependem do .env de quem roda.
+    return Settings(_env_file=None, env="local", version="test", cors_origins=[ALLOWED_ORIGIN])
+
+
+@pytest.fixture
+def app(settings: Settings) -> FastAPI:
+    return create_app(settings)
 
 
 @pytest.fixture
@@ -123,9 +131,9 @@ from datetime import timedelta
 
 import pytest
 
-from bot_varejo.core.scope import Scope
-from bot_varejo.contexts.health.application.get_health import AppInfo, GetHealthUseCase
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.core.scope import Scope
+from api.contexts.health.application.get_health import AppInfo, GetHealthUseCase
+from api.contexts.health.domain.value_objects import HealthStatus
 from tests.fakes import STARTED_AT, FakeClock, StubCheck
 
 
@@ -173,9 +181,9 @@ import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-from bot_varejo.contexts.health.application.get_health import AppInfo, GetHealthUseCase
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
-from bot_varejo.contexts.health.presentation.dependencies import get_health_use_case
+from api.contexts.health.application.get_health import AppInfo, GetHealthUseCase
+from api.contexts.health.domain.value_objects import HealthStatus
+from api.contexts.health.presentation.dependencies import get_health_use_case
 from tests.fakes import STARTED_AT, FakeClock, StubCheck
 
 EXPECTED_FIELDS = {"status", "scope", "version", "uptimeSeconds", "checkedAt", "components"}
@@ -229,7 +237,9 @@ async def test_preflight_allows_configured_origin(client: AsyncClient) -> None:
 
 
 async def test_response_has_no_cors_header_for_unknown_origin(client: AsyncClient) -> None:
-    response = await client.get("/api/v1/public/health", headers={"Origin": "https://malicioso.example"})
+    response = await client.get(
+        "/api/v1/public/health", headers={"Origin": "https://malicioso.example"}
+    )
 
     assert "access-control-allow-origin" not in response.headers
 ```
@@ -265,7 +275,10 @@ def test_unknown_type_returns_error(ws_client: TestClient) -> None:
     assert reply == {
         "type": "error",
         "id": "1",
-        "payload": {"code": "unknown_message_type", "message": "Tipo de mensagem não suportado: nope"},
+        "payload": {
+            "code": "unknown_message_type",
+            "message": "Tipo de mensagem não suportado: nope",
+        },
     }
 
 
@@ -296,7 +309,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
-OPENAPI_PATH = Path(__file__).parents[2] / "openapi.json"   # openapi.json na raiz do repositório
+OPENAPI_PATH = Path(__file__).parents[2] / "openapi.json"  # openapi.json na raiz do repositório
 
 
 def test_committed_openapi_matches_backend(app: FastAPI) -> None:
@@ -311,15 +324,15 @@ def test_committed_openapi_matches_backend(app: FastAPI) -> None:
 ### Smoke da imagem (CI)
 
 ```bash
-docker run -d --name api-smoke -p 8000:8000 bot-varejo-backend:ci
+docker run -d --name bot-varejo-api-smoke -p 8000:8000 bot-varejo-api:ci
 for i in $(seq 1 20); do curl -fsS http://localhost:8000/api/v1/public/health && break; sleep 1; done
 curl -fsS http://localhost:8000/api/v1/admin/health
-docker rm -f api-smoke
+docker rm -f bot-varejo-api-smoke
 ```
 
 ## 7. Onde cada teste roda
 
 | Etapa | Comando | Local | CI |
 |-------|---------|-------|----|
-| Unit + integração + contrato | `make test` | ✅ | ✅ |
-| Smoke da imagem | job `backend:smoke` | — | ✅ |
+| Unit + integração + contrato | `make test` (`coverage run -m pytest` + `coverage report`) | ✅ | ✅ |
+| Smoke da imagem | job `backend:build` (sobe o container e chama os dois health) | — | ✅ |

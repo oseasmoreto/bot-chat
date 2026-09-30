@@ -74,6 +74,6 @@ tags:      backend-vX.Y.Z · frontend-vX.Y.Z (na master)
 
 ## Templates de merge request
 
-Cada projeto tem os seus, em `<projeto>/.gitlab/merge_request_templates/` (Default, Bugfix, Hotfix, Docs).
+Cada projeto tem os seus, em `<projeto>/.gitlab/merge_request_templates/` (Default, Bugfix, Docs, Hotfix, Release).
 
 > ⚠️ O GitLab só oferece no seletor os templates que estão em `.gitlab/merge_request_templates/` **na raiz do repositório**. Neste repositório, copie o conteúdo do template do projeto para a descrição do MR.

@@ -4,7 +4,7 @@ API REST + WebSocket do Bot Varejo: **Python 3.13 · FastAPI · async · WebSock
 
 > 📚 Documentação completa: [`docs/`](./docs/README.md) · Branch/commit/MR: [CONTRIBUTING.md](./CONTRIBUTING.md) · Templates de MR: [`.gitlab/`](./.gitlab/merge_request_templates)
 >
-> ⚠️ **Status:** documentação e arquivos Docker prontos; o código da aplicação ainda não existe. O DynamoDB Local já sobe com o compose; build e execução da API passam a funcionar quando o código for implementado.
+> **Status:** fundação implementada — health check (`public`/`admin`) via HTTP e WebSocket, CORS, validação de `Origin`, erros padronizados, log JSON e `X-Request-ID`. O acesso ao DynamoDB (`core/dynamodb`) chega com o primeiro context que persistir dados.
 
 ## O sistema
 
@@ -31,9 +31,8 @@ flowchart LR
 | Ferramenta | Versão | Obrigatória para |
 |------------|--------|------------------|
 | Docker Engine + Docker Compose v2 | Compose ≥ 2.24 | Rodar a API e o banco (caminho recomendado) |
-| Python | 3.13 (`.python-version`) | Rodar sem Docker, testes e lint |
-| uv | 0.12+ | Dependências Python (`curl -LsSf https://astral.sh/uv/install.sh \| sh`) |
-| pre-commit | 3+ | Hooks de commit (`uv tool install pre-commit`) |
+| Python + venv | 3.13 (`python3.13 -m venv` — no Debian/Ubuntu: `sudo apt install python3.13-venv`) | Rodar sem Docker, testes e lint |
+| make | qualquer | *(opcional)* atalhos do `Makefile` — todo comando também está escrito por extenso abaixo |
 | websocat, AWS CLI | — | *(opcionais)* testar WebSocket e inspecionar o DynamoDB Local |
 
 > **Linux/WSL:** seu usuário precisa estar no grupo `docker` — `sudo usermod -aG docker $USER` e abra um novo terminal. Sem isso aparece `permission denied … docker.sock`.
@@ -59,7 +58,9 @@ flowchart LR
 
    ```bash
    git config commit.template .gitmessage   # template de mensagem de commit
-   uv sync                                   # dependências (inclui as de desenvolvimento)
+   python3.13 -m venv .venv                  # ambiente virtual do projeto
+   .venv/bin/pip install -r requirements-test.txt   # runtime + testes e qualidade (inclui pre-commit)
+   source .venv/bin/activate                 # ativa o venv neste terminal
    pre-commit install                        # hooks: commitlint, nome da branch, ruff, mypy
    ```
 
@@ -74,7 +75,7 @@ O compose sobe dois serviços:
 
 ### Desenvolvimento (recomendado no dia a dia)
 
-Código de `src/` montado no container: **cada alteração recarrega a API sozinha** (~2 s), sem subir de novo. Só mudar `pyproject.toml`, `uv.lock` ou `Dockerfile` pede `--build`.
+Código de `api/` montado no container: **cada alteração recarrega a API sozinha** (~2 s), sem subir de novo. Só mudar `requirements.txt`, `requirements-test.txt` ou `Dockerfile` pede `--build`.
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
@@ -95,16 +96,12 @@ docker compose up --build -d
 ```bash
 docker compose -f docker-compose.dev.yml up -d bot-varejo-dynamodb
 APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001 \
-  uv run --env-file .env uvicorn bot_varejo.main:create_app --factory --reload --port 8000
+  PYTHONPATH=. .venv/bin/uvicorn api.app_run:create_app --factory --reload --port 8000
 ```
 
 ### Tabelas do banco
 
-Cada bounded context com persistência tem sua tabela ([docs/12](./docs/12-persistencia-dynamodb.md)). Com o banco no ar, crie/atualize as tabelas locais com:
-
-```bash
-uv run python -m bot_varejo.scripts.create_tables    # idempotente
-```
+Cada bounded context com persistência tem sua tabela ([docs/12](./docs/12-persistencia-dynamodb.md)). O script que cria as tabelas no DynamoDB Local (`python -m api.scripts.create_tables`, idempotente) chega junto com o primeiro context que persistir dados.
 
 ### Comandos úteis
 
@@ -116,7 +113,7 @@ Acrescente `-f docker-compose.dev.yml` quando estiver usando o compose de desenv
 | Acompanhar logs da API | `docker compose logs -f bot-varejo-api` |
 | Parar tudo | `docker compose down` |
 | Parar e **apagar os dados** do banco local | `docker compose down -v` |
-| Recriar após mudar `pyproject.toml`/`uv.lock`/`Dockerfile` (código em `src/` não precisa) | `docker compose up --build` |
+| Recriar após mudar `requirements*.txt`/`Dockerfile` (código em `api/` não precisa) | `docker compose up --build` |
 | Shell dentro da API | `docker compose exec bot-varejo-api sh` |
 | Listar tabelas do banco local | `aws dynamodb list-tables --endpoint-url http://localhost:8001` |
 
@@ -152,16 +149,42 @@ echo '{"type":"health.ping","id":"1","payload":{}}' \
 
 O CORS já libera `http://localhost:3000` por padrão; se o front rodar em outra porta, ajuste `APP_CORS_ORIGINS` no `.env`.
 
+## Estrutura e dependências
+
+```text
+api/                     # código da aplicação
+├── app_run.py           # create_app()
+├── config.py            # Settings (variáveis APP_*)
+├── container.py         # montagem de adapters e casos de uso
+├── core/                # cors, swagger, logs, errors, request_id, websocket…
+├── routes/              # public.py, admin.py, websocket.py
+├── contexts/<context>/  # DDD: domain, application, infrastructure, presentation
+└── scripts/             # python -m api.scripts.<nome>
+tests/                   # unit, integration, contract
+config/                  # deploy/infra da plataforma (não alterar a estrutura)
+certificates/            # certificados de CA adicionais (.crt)
+requirements.txt         # dependências de runtime (versões fixadas)
+requirements-test.txt    # -r requirements.txt + testes e qualidade
+```
+
+- O que vai em cada pasta e onde colocar algo novo: [docs/02 — Estrutura](./docs/02-estrutura.md#o-que-vai-em-cada-pasta).
+- Cada lib, para que serve e como adicionar/atualizar: [docs/13 — Dependências](./docs/13-dependencias.md).
+- GitHub Copilot (VS Code): regras em `.github/`, prompts `/novo-context`, `/novo-modulo`, `/novo-endpoint`, `/nova-mensagem-ws`, `/revisar-arquitetura` e o agente `backend-ddd` — ver [docs/14 — IA](./docs/14-ia-copilot.md). Lib nova = linha com versão fixada no arquivo certo + `docker compose … up --build`.
+
 ## Testes e qualidade
 
+Com o venv ativado, na raiz do projeto (`export PYTHONPATH=.`):
+
 ```bash
-uv run pytest                  # testes + cobertura (≥ 90%) + contrato OpenAPI
-uv run ruff check .            # lint
-uv run ruff format .           # formatação
-uv run mypy src tests          # tipos (--strict)
-uv run lint-imports            # fronteiras das camadas DDD
-uv run python -m bot_varejo.scripts.export_openapi openapi.json   # atualiza o contrato
+coverage run -m pytest && coverage report   # testes + cobertura (≥ 90%) + contrato OpenAPI
+ruff check .                                # lint
+ruff format .                               # formatação
+mypy api tests                              # tipos (--strict)
+lint-imports                                # fronteiras das camadas DDD
+python -m api.scripts.export_openapi openapi.json   # atualiza o contrato
 ```
+
+Com `make`: `make check` roda tudo o que o CI valida (`make help` lista os atalhos).
 
 Os testes de integração dos repositórios usam o DynamoDB Local: deixe `bot-varejo-dynamodb` no ar e rode com `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001`.
 
@@ -190,8 +213,9 @@ Os testes de integração dos repositórios usam o DynamoDB Local: deixe `bot-va
 | DynamoDB Local não sobe ou não grava | Volume corrompido ou de outra versão | `docker compose down -v` e subir de novo (apaga os dados locais) |
 | Front mostra erro de CORS no console | Origem do front fora de `APP_CORS_ORIGINS` | Ajustar `.env`: `APP_CORS_ORIGINS='["http://localhost:3000"]'` |
 | WebSocket fecha na hora (código 1008) | `Origin` ausente ou não permitido | Enviar `Origin` permitido (navegador envia sozinho) |
-| Teste de contrato falhando | `openapi.json` desatualizado | `uv run python -m bot_varejo.scripts.export_openapi openapi.json` e commitar |
-| Mudança em `pyproject.toml` não aparece no dev | Deps instaladas no build | Subir com `--build` |
+| Teste de contrato falhando | `openapi.json` desatualizado | `python -m api.scripts.export_openapi openapi.json` (venv ativado, `PYTHONPATH=.`) e commitar |
+| Lib nova não aparece no dev (`ModuleNotFoundError`) | Deps instaladas no build da imagem | Subir com `--build`; fora do Docker, `.venv/bin/pip install -r requirements-test.txt` |
+| `ModuleNotFoundError: No module named 'api'` fora do Docker | Raiz do projeto fora do caminho de import | Rodar da raiz do projeto com `PYTHONPATH=.` (o `make` já define) |
 
 ## Contribuindo
 

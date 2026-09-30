@@ -27,7 +27,7 @@ frontend/
 ├── .gitignore                      # arquivos fora do git (node_modules, .next, .env…)
 ├── .gitlab-ci.yml                  # pipeline: validate, lint, testes, build, e2e, publish
 ├── .gitlab/
-│   └── merge_request_templates/    # templates de MR do frontend: Default, Bugfix, Hotfix, Docs
+│   └── merge_request_templates/    # templates de MR do frontend: Default, Bugfix, Docs, Hotfix, Release
 ├── scripts/
 │   └── fetch-openapi.mjs           # baixa o /api/openapi.json da API para src/shared/api/
 ├── public/                         # favicon, imagens estáticas

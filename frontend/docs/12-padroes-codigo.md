@@ -54,7 +54,7 @@ import { useApiClient } from '@/shared/api';
 import { getHealth } from '../api/getHealth';
 ```
 
-Python: ordenado pelo ruff (`I`) — stdlib, terceiros, `bot_varejo`.
+Python: ordenado pelo ruff (`I`) — stdlib, terceiros, `api`.
 
 
 ## Boas práticas gerais

@@ -1,6 +1,6 @@
 # ADRs — Frontend
 
-Decisões de arquitetura do **frontend**. Formato: Contexto, Decisão, Alternativas, Consequências. Uma decisão nova que altera outra cria um novo ADR e marca o anterior como *Substituído*.
+Decisões de arquitetura do **frontend**. Formato: Contexto, Decisão, Alternativas, Consequências. Os ADRs descrevem **só a decisão vigente**: quando uma decisão muda, o ADR correspondente é reescrito com a decisão atual (o histórico fica no git).
 
 | ADR | Título | Status |
 |-----|--------|--------|

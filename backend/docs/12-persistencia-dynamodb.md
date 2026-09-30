@@ -91,7 +91,7 @@ No DynamoDB, **as chaves nascem dos padrões de acesso**, não das entidades. To
 ## 4. Estrutura no código
 
 ```text
-src/bot_varejo/
+api/
 ├── core/dynamodb/
 │   ├── __init__.py
 │   ├── resource.py          # DynamoDbResource: sessão aioboto3, resource/cliente, nomes das tabelas
@@ -114,8 +114,8 @@ from contextlib import AsyncExitStack
 
 import aioboto3
 
-from bot_varejo.core.config import Settings
-from bot_varejo.core.dynamodb.types import DynamoDbClient, DynamoDbServiceResource, Table
+from api.config import Settings
+from api.core.dynamodb.types import DynamoDbClient, DynamoDbServiceResource, Table
 
 
 class DynamoDbResource:
@@ -133,8 +133,12 @@ class DynamoDbResource:
             "region_name": self._settings.aws_region,
             "endpoint_url": self._settings.dynamodb_endpoint_url,  # None na AWS
         }
-        self._resource = await self._stack.enter_async_context(self._session.resource("dynamodb", **options))
-        self._client = await self._stack.enter_async_context(self._session.client("dynamodb", **options))
+        self._resource = await self._stack.enter_async_context(
+            self._session.resource("dynamodb", **options)
+        )
+        self._client = await self._stack.enter_async_context(
+            self._session.client("dynamodb", **options)
+        )
 
     async def close(self) -> None:
         await self._stack.aclose()
@@ -152,9 +156,9 @@ class DynamoDbResource:
         return self._client
 ```
 
-> `core/dynamodb/types.py` reexporta os tipos dos stubs `types-aioboto3[dynamodb]` (dependência de desenvolvimento), para o `mypy --strict` checar as chamadas ao DynamoDB.
+> `core/dynamodb/types.py` reexporta os tipos dos stubs `types-aioboto3[dynamodb]` (em `requirements-test.txt`, junto com a implementação), para o `mypy --strict` checar as chamadas ao DynamoDB.
 
-### 4.2 Ciclo de vida (`main.py`)
+### 4.2 Ciclo de vida (`app_run.py`)
 
 ```python
 from collections.abc import AsyncIterator
@@ -184,7 +188,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 # contexts/partners/domain/ports.py
 from typing import Protocol
 
-from bot_varejo.contexts.partners.domain.entities import Partner, PartnerId
+from api.contexts.partners.domain.entities import Partner, PartnerId
 
 
 class PartnerRepository(Protocol):
@@ -196,10 +200,10 @@ class PartnerRepository(Protocol):
 # contexts/partners/infrastructure/dynamodb_partner_repository.py
 from botocore.exceptions import ClientError
 
-from bot_varejo.core.dynamodb.errors import ConcurrencyError
-from bot_varejo.core.dynamodb.resource import DynamoDbResource
-from bot_varejo.contexts.partners.domain.entities import Partner, PartnerId
-from bot_varejo.contexts.partners.infrastructure.codecs import partner_from_item, partner_to_item
+from api.core.dynamodb.errors import ConcurrencyError
+from api.core.dynamodb.resource import DynamoDbResource
+from api.contexts.partners.domain.entities import Partner, PartnerId
+from api.contexts.partners.infrastructure.codecs import partner_from_item, partner_to_item
 
 CONTEXT = "partners"
 
@@ -227,7 +231,9 @@ class DynamoDbPartnerRepository:
             )
         except ClientError as exc:
             if exc.response["Error"]["Code"] == "ConditionalCheckFailedException":
-                raise ConcurrencyError(f"Parceiro {partner.id} alterado por outra operação") from exc
+                raise ConcurrencyError(
+                    f"Parceiro {partner.id} alterado por outra operação"
+                ) from exc
             raise
 ```
 
@@ -241,9 +247,9 @@ from collections.abc import Sequence
 
 from botocore.exceptions import BotoCoreError, ClientError
 
-from bot_varejo.core.dynamodb.resource import DynamoDbResource
-from bot_varejo.contexts.health.domain.entities import ComponentHealth
-from bot_varejo.contexts.health.domain.value_objects import HealthStatus
+from api.core.dynamodb.resource import DynamoDbResource
+from api.contexts.health.domain.entities import ComponentHealth
+from api.contexts.health.domain.value_objects import HealthStatus
 
 
 class DynamoDbHealthCheck:
@@ -258,11 +264,19 @@ class DynamoDbHealthCheck:
     async def check(self) -> ComponentHealth:
         try:
             for context in self._contexts:
-                description = await self._db.client.describe_table(TableName=self._db.table_name(context))
+                description = await self._db.client.describe_table(
+                    TableName=self._db.table_name(context)
+                )
                 if description["Table"]["TableStatus"] != "ACTIVE":
-                    return ComponentHealth(name=self.name, status=HealthStatus.DEGRADED, detail=f"{context}: tabela não ativa")
+                    return ComponentHealth(
+                        name=self.name,
+                        status=HealthStatus.DEGRADED,
+                        detail=f"{context}: tabela não ativa",
+                    )
         except (ClientError, BotoCoreError):
-            return ComponentHealth(name=self.name, status=HealthStatus.DOWN, detail="DynamoDB indisponível")
+            return ComponentHealth(
+                name=self.name, status=HealthStatus.DOWN, detail="DynamoDB indisponível"
+            )
         return ComponentHealth(name=self.name, status=HealthStatus.OK)
 ```
 
@@ -323,9 +337,9 @@ Fixture de integração: cria as tabelas com um **prefixo único por execução*
 # tests/integration/conftest.py (trecho)
 @pytest.fixture(scope="session")
 async def dynamodb(settings_for_tests: Settings) -> AsyncIterator[DynamoDbResource]:
-    db = DynamoDbResource(settings_for_tests)            # prefixo test-<uuid>
+    db = DynamoDbResource(settings_for_tests)  # prefixo test-<uuid>
     await db.start()
-    await create_tables(db)                              # mesmas definições do make db-init
+    await create_tables(db)  # mesmas definições do make db-init
     try:
         yield db
     finally:

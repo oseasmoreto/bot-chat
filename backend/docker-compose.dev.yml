@@ -1,5 +1,5 @@
-# Desenvolvimento local: API com --reload (src/ montado) + DynamoDB Local.
-# Alterações em src/ recarregam sozinhas. Só pyproject.toml/uv.lock/Dockerfile pedem --build.
+# Desenvolvimento local: API com --reload (api/ montado) + DynamoDB Local.
+# Alterações em api/ recarregam sozinhas. Só requirements*.txt/Dockerfile pedem --build.
 # Uso: docker compose -f docker-compose.dev.yml up --build
 name: bot-varejo-backend-dev
 
@@ -13,7 +13,7 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
-      - ./src:/app/src
+      - ./api:/app/api
     environment:
       APP_ENV: local
       APP_LOG_LEVEL: ${APP_LOG_LEVEL:-DEBUG}

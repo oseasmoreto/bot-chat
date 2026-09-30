@@ -33,10 +33,10 @@ flowchart LR
     browser["🌐 Navegador<br/>(código do frontend)"]
     lb["Load balancer / ingress<br/>TLS · api.&lt;dominio&gt;<br/>(plataforma de deploy)"]
     subgraph c["Container: bot-varejo-backend (python:3.13-slim)"]
-        uv["Uvicorn :8000<br/>FastAPI app"]
+        uvicorn["Uvicorn :8000<br/>FastAPI app"]
     end
-    browser -->|"HTTPS / WSS"| lb -->|"HTTP / WS"| uv
-    uv -->|"aioboto3 (HTTPS)"| ddb[("Amazon DynamoDB<br/>uma tabela por context")]
+    browser -->|"HTTPS / WSS"| lb -->|"HTTP / WS"| uvicorn
+    uvicorn -->|"aioboto3 (HTTPS)"| ddb[("Amazon DynamoDB<br/>uma tabela por context")]
 ```
 
 | Elemento | Responsabilidade |
@@ -151,4 +151,4 @@ flowchart LR
     iam -.-> partners
 ```
 
-Cada um será um pacote em `src/bot_varejo/contexts/<nome>/` com as mesmas quatro camadas e, quando persistir dados, **a sua própria tabela no DynamoDB**. Com mais de uma réplica e WebSocket com estado (chat), será necessário *pub/sub* (ex.: Redis) — decisão futura em ADR.
+Cada um será um pacote em `api/contexts/<nome>/` com as mesmas quatro camadas e, quando persistir dados, **a sua própria tabela no DynamoDB**. Com mais de uma réplica e WebSocket com estado (chat), será necessário *pub/sub* (ex.: Redis) — decisão futura em ADR.

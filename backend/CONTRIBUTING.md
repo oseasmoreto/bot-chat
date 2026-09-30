@@ -191,7 +191,7 @@ Refs: CPBS-123
 | `Refs: CPBS-123` | **Obrigatório** em todo commit de trabalho — liga o commit ao ticket |
 | `BREAKING CHANGE:` | Obrigatório quando quebra contrato ou comportamento esperado por quem consome. Também marcar `!` no cabeçalho |
 
-Template de mensagem: [`.gitmessage`](./.gitmessage) — ativado por `make setup` (`uv sync` + `pre-commit install` + `git config commit.template .gitmessage`).
+Template de mensagem: [`.gitmessage`](./.gitmessage) — ativado por `make setup` (venv + `pip install -r requirements-test.txt` + `pre-commit install` + `git config commit.template .gitmessage`).
 
 Os commits de merge gerados pelo GitLab em todos os MRs (`Merge branch 'feat/…' into 'developer'`) são aceitos automaticamente pelo commitlint.
 
@@ -219,7 +219,7 @@ Qualquer tipo com `!` ou rodapé `BREAKING CHANGE:` gera versão **major** (em `
 |--------|-------------|
 | `backend` | Qualquer mudança de código, testes, docs, Docker ou config do backend |
 | `ci` | Pipeline (`.gitlab-ci.yml`) |
-| `deps` | Atualização de dependências (`pyproject.toml` / `uv.lock`) |
+| `deps` | Atualização de dependências (`requirements.txt` / `requirements-test.txt`) |
 | `repo` | Arquivos de repositório: `README.md`, `CONTRIBUTING.md`, `.gitmessage`, templates, hooks |
 | `release` | **Somente** título de MR de promoção e de back-merge (§1.6 e §1.7) |
 
@@ -529,17 +529,17 @@ repos:
       # Qualidade do backend
       - id: ruff
         name: ruff (lint)
-        entry: uv run ruff check --fix
+        entry: .venv/bin/ruff check --fix
         language: system
         types: [python]
       - id: ruff-format
         name: ruff (format)
-        entry: uv run ruff format
+        entry: .venv/bin/ruff format
         language: system
         types: [python]
       - id: mypy
         name: mypy --strict
-        entry: uv run mypy src tests
+        entry: .venv/bin/mypy api tests
         language: system
         types: [python]
         pass_filenames: false

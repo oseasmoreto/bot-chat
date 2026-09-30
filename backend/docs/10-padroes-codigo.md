@@ -37,7 +37,7 @@ A orientação do projeto é **camelCase para métodos**. No backend aplicamos a
 | `mypy` | `strict = true` |
 | `import-linter` | fronteiras das camadas DDD ([03](./03-arquitetura-ddd.md)) |
 | EditorConfig | UTF-8, LF, indentação 4, newline final |
-| pre-commit | roda ruff e mypy nos arquivos alterados de `backend/` |
+| pre-commit | roda ruff e mypy nos arquivos alterados |
 
 
 ## Nomenclatura do código Python
@@ -74,47 +74,89 @@ A orientação do projeto é **camelCase para métodos**. No backend aplicamos a
 
 ## Configuração das ferramentas (`pyproject.toml`)
 
+O `pyproject.toml` só configura as ferramentas; as dependências ficam em `requirements.txt` e `requirements-test.txt`, com versões fixadas ([ADR-0004](./adr/0004-pip-requirements.md)).
+
 ```toml
+# Configuração das ferramentas. As dependências ficam em requirements.txt / requirements-test.txt.
 [project]
 name = "bot-varejo"
 version = "0.1.0"
 requires-python = ">=3.13"
-dependencies = [
-    "fastapi",
-    "uvicorn[standard]",        # inclui suporte a websockets
-    "pydantic",
-    "pydantic-settings",
-]
-
-[dependency-groups]
-dev = ["pytest", "pytest-asyncio", "pytest-cov", "httpx", "mypy", "ruff", "import-linter"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py313"
-src = ["src", "tests"]
+src = ["."]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ASYNC", "RUF", "ANN", "S", "PT", "PL"]
 ignore = []
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004"]   # assert e números mágicos permitidos em testes
+"tests/**" = ["S101", "PLR2004", "PLR0913", "PLR0917"]   # assert, números mágicos e fixtures
 
 [tool.mypy]
 strict = true
 plugins = ["pydantic.mypy"]
-mypy_path = "src"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
-pythonpath = ["."]                 # permite `from tests.fakes import ...`
-addopts = "--strict-markers --cov=bot_varejo --cov-report=term-missing"
+pythonpath = ["."]                 # `import api...` e `from tests.fakes import ...`
+addopts = "--strict-markers --strict-config"
+filterwarnings = [
+    "error",
+    # Aviso interno do Starlette com o anyio atual; não vem do nosso código.
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["api"]
+branch = true
 
 [tool.coverage.report]
 fail_under = 90
 show_missing = true
-```
+skip_covered = true
+exclude_also = [
+    "class .*\\bProtocol\\):",    # ports: só assinaturas
+    "if __name__ == .__main__.:",
+]
 
-> Versões exatas das dependências ficam no `uv.lock` (fixadas no momento da implementação).
+[tool.importlinter]
+root_packages = ["api"]
+include_external_packages = true   # necessário para proibir fastapi/pydantic/boto no domínio
+
+[[tool.importlinter.contracts]]
+name = "Camadas de cada context"
+type = "layers"
+containers = ["api.contexts.*"]            # todo context novo entra sozinho
+layers = ["presentation", "application", "domain"]
+
+[[tool.importlinter.contracts]]
+name = "Presentation não importa infrastructure diretamente (só via container)"
+type = "forbidden"
+source_modules = ["api.contexts.*.presentation"]
+forbidden_modules = ["api.contexts.*.infrastructure"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Domínio não depende de frameworks nem de AWS"
+type = "forbidden"
+source_modules = ["api.contexts.*.domain"]
+forbidden_modules = [
+    "fastapi", "pydantic", "starlette", "aioboto3", "boto3", "botocore", "httpx", "tenacity",
+]
+
+[[tool.importlinter.contracts]]
+name = "Casos de uso não dependem de framework web, AWS nem HTTP (usam as ports)"
+type = "forbidden"
+source_modules = ["api.contexts.*.application"]
+forbidden_modules = ["fastapi", "starlette", "aioboto3", "boto3", "botocore", "httpx"]
+
+[[tool.importlinter.contracts]]
+name = "Contexts independentes entre si"
+type = "independence"
+modules = ["api.contexts.*"]
+```

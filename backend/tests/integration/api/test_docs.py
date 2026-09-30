@@ -1,0 +1,24 @@
+import pytest
+from httpx import ASGITransport, AsyncClient
+
+from api.app_run import create_app
+from api.config import Settings
+
+DOC_PATHS = ["/api/docs", "/api/redoc", "/api/openapi.json"]
+
+
+@pytest.mark.parametrize("path", DOC_PATHS)
+async def test_docs_are_served_when_enabled(client: AsyncClient, path: str) -> None:
+    response = await client.get(path)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("path", DOC_PATHS)
+async def test_docs_are_hidden_when_disabled(settings: Settings, path: str) -> None:
+    app = create_app(settings.model_copy(update={"docs_enabled": False}))
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as http:
+        response = await http.get(path)
+
+    assert response.status_code == 404

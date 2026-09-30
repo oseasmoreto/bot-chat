@@ -40,7 +40,7 @@ flowchart LR
 | Docker Engine + Docker Compose v2 | Compose ≥ 2.24 | Rodar o app (caminho recomendado) |
 | Node.js | 24 LTS (`.nvmrc`) | Rodar sem Docker, testes e lint |
 | pnpm | via `corepack enable` | Dependências |
-| pre-commit | 3+ | Hooks de commit (`pipx install pre-commit` ou `uv tool install pre-commit`) |
+| pre-commit | 3+ | Hooks de commit (`pipx install pre-commit`) |
 
 > **Linux/WSL:** seu usuário precisa estar no grupo `docker` — `sudo usermod -aG docker $USER` e abra um novo terminal. Sem isso aparece `permission denied … docker.sock`.
 >

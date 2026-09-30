@@ -17,7 +17,7 @@
 | Termo | Significado |
 |-------|-------------|
 | **Escopo (scope)** | `public` ou `admin`. Define prefixos de rota (`/api/v1/{scope}`, `/api/v1/ws/{scope}`) e, no futuro, regras de auth |
-| **Bounded context** | Fronteira de um subdomínio no DDD; uma pasta em `src/bot_varejo/contexts/` |
+| **Bounded context** | Fronteira de um subdomínio no DDD; uma pasta em `api/contexts/` |
 | **Shared kernel** | Código mínimo compartilhado entre contexts (`core/`) |
 | **Entidade / Value object** | Objetos de domínio; value objects são imutáveis e comparados por valor |
 | **Caso de uso** | Classe da camada `application` que orquestra uma ação (`GetHealthUseCase`) |
