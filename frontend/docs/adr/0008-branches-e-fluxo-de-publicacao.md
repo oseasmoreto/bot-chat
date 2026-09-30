@@ -16,7 +16,7 @@ O time precisa de ambientes separados de desenvolvimento, homologação e produ�
 - **Hotfix** sai da `master`, volta para a `master` e é obrigatoriamente levado de volta por **back-merge** `master → staging → developer`.
 - Tags de versão `frontend-vX.Y.Z` **somente na `master`**; o deploy em production é feito a partir da tag, com **aprovação manual**. `developer` e `staging` fazem deploy automático.
 - A matriz origem → destino (e a ausência de squash) é validada no CI (`scripts/check-mr-flow.sh`).
-- O E2E de cada MR roda contra a imagem do backend **do mesmo ambiente de destino** (`:developer`, `:staging`, `:master`).
+- O E2E roda **depois do deploy** em `development` e `staging`, contra o próprio ambiente (URLs das variáveis do ambiente); o pipeline do frontend nunca sobe a API ou o banco.
 
 Detalhes: [CONTRIBUTING §1](../../CONTRIBUTING.md#1-branches-e-fluxo-de-publicação) e [13 — CI](../13-ci.md).
 
@@ -29,4 +29,4 @@ Detalhes: [CONTRIBUTING §1](../../CONTRIBUTING.md#1-branches-e-fluxo-de-publica
 - Correções achadas em homologação passam pela `developer` e por uma nova promoção — nunca direto na `staging`.
 - Esquecer o back-merge de um hotfix faz a correção sumir na próxima promoção: por isso ele faz parte do checklist do template *Hotfix*.
 - O autor é responsável pela qualidade de cada commit (mensagem, uma mudança lógica por commit).
-- O frontend só chega a um ambiente depois do backend de que depende — o E2E contra a imagem do backend do mesmo ambiente reforça isso.
+- O frontend só chega a um ambiente depois do backend de que depende — o E2E contra o ambiente implantado confirma isso.

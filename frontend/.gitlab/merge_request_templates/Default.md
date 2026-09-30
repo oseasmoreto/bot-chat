@@ -47,8 +47,8 @@ CPBS-
 
 ## 🧪 Como testar
 
-1. Subir a API (`make dev` no repositório do backend, ou aqui `docker compose --profile api up`)
-2. `make dev`
+1. Subir a API e o banco no repositório do backend (`docker compose -f docker-compose.dev.yml up --build`)
+2. Aqui: `docker compose -f docker-compose.dev.yml up --build`
 3. Acessar <!-- http://localhost:3000/... -->
 
 **Testes adicionados/alterados:**

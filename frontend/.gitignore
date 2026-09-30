@@ -1,0 +1,41 @@
+# --- Dependências -----------------------------------------------------------------
+node_modules/
+.pnpm-store/
+
+# --- Next.js e build ---------------------------------------------------------------
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# --- Testes ---------------------------------------------------------------------
+coverage/
+report.xml
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# --- Variáveis de ambiente (nunca versionar segredos) ------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Logs -----------------------------------------------------------------------
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Editores e sistema operacional ----------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*.pem
+.DS_Store
+Thumbs.db
+
+# Versionados de propósito (não ignorar): pnpm-lock.yaml,
+# src/shared/api/openapi.json e src/shared/api/schema.d.ts

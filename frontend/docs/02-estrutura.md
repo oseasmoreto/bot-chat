@@ -19,11 +19,12 @@ frontend/
 ├── vitest.config.ts
 ├── playwright.config.ts
 ├── Dockerfile                      # multi-stage: deps, dev, builder, runtime (node:24-slim)
-├── docker-compose.yml              # sobe a imagem de runtime (+ profile "api" com o backend)
+├── docker-compose.yml              # bot-varejo-web (runtime)
 ├── docker-compose.dev.yml          # next dev com hot reload
 ├── Makefile
 ├── .env.example                    # todas as variáveis documentadas
 ├── .dockerignore
+├── .gitignore                      # arquivos fora do git (node_modules, .next, .env…)
 ├── .gitlab-ci.yml                  # pipeline: validate, lint, testes, build, e2e, publish
 ├── .gitlab/
 │   └── merge_request_templates/    # templates de MR do frontend: Default, Bugfix, Hotfix, Docs

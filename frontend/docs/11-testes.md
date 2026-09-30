@@ -15,7 +15,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    e2e["E2E — Playwright<br/>telas críticas contra a imagem do front + API real"]
+    e2e["E2E — Playwright<br/>telas críticas contra as URLs do ambiente (.env)"]
     screen["Telas<br/>render de page.tsx com providers + MSW"]
     comp["Componentes, hooks, api/<br/>Vitest + Testing Library + MSW"]
     e2e --- screen --- comp
@@ -32,7 +32,7 @@ flowchart TB
 | Shell de área (`WebShell`, `AdminShell`) | Render | Vitest + Testing Library | ✅ |
 | Cliente WS (`shared/ws`) | Unitário com WebSocket falso (reconexão, mensagens) | Vitest | ✅ |
 | **Tela (`page.tsx`)** | Render com providers | Vitest + Testing Library | ✅ **toda tela** |
-| Jornada crítica | E2E contra o container | Playwright | ✅ para cada tela nova (smoke) |
+| Jornada crítica | E2E contra as URLs do ambiente (`E2E_BASE_URL`) | Playwright | ✅ para cada tela nova (smoke) |
 | Imagem Docker | Smoke: container sobe e `/healthz` responde 200 | CI | ✅ |
 
 ## 4. Convenções
@@ -235,18 +235,33 @@ test('web mostra a API saudável via HTTP e WebSocket', async ({ page }) => {
 ```ts
 import { defineConfig } from '@playwright/test';
 
+// URLs vêm do .env (local) ou das variáveis do ambiente (CI).
+// Sem webServer: o Playwright nunca sobe o front nem a API.
+try {
+  process.loadEnvFile('.env');
+} catch {
+  // sem .env: valem as variáveis já definidas no ambiente
+}
+
 export default defineConfig({
   testDir: './e2e',
   use: { baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000' },
 });
 ```
 
-Os E2E rodam contra a **imagem de runtime do front** + **API real** (compose do backend ou profile `api`) — validam CORS, WebSocket e a configuração de runtime de verdade.
+Os E2E usam **as URLs configuradas** — nunca sobem front, API ou banco:
+
+| Onde | Front testado (`E2E_BASE_URL`) | API usada pelo front (`API_URL`/`WS_URL`) |
+|------|-------------------------------|-------------------------------------------|
+| Local | `.env` → `http://localhost:3000` (front rodando pelo compose deste projeto) | `.env` → `http://localhost:8000` (API rodando pelo compose do backend) |
+| CI | Variável do ambiente → `https://app-dev.<dominio>` / `https://app-staging.<dominio>` | Configuradas no front implantado daquele ambiente |
+
+Assim os E2E validam CORS, WebSocket e a configuração de runtime de verdade.
 
 ## 7. Onde cada teste roda
 
 | Etapa | Comando | Local | CI |
 |-------|---------|-------|----|
 | Unit + componentes + telas | `make test` | ✅ | ✅ |
-| E2E | `make e2e` (com front e API no ar) | ✅ | ✅ |
+| E2E | `pnpm e2e` (front e API no ar, URLs do `.env`) | ✅ | ✅ após deploy em development/staging |
 | Smoke da imagem | job `frontend:build` | — | ✅ |

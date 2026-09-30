@@ -1,0 +1,23 @@
+# Desenvolvimento local: next dev com hot reload (src/ e public/ montados).
+# Uso: docker compose -f docker-compose.dev.yml up --build
+# A API deve estar rodando (compose do backend) em http://localhost:8000.
+name: bot-varejo-frontend-dev
+
+services:
+  bot-varejo-web:
+    container_name: bot-varejo-web-dev
+    build:
+      context: .
+      target: dev
+    image: bot-varejo-web:dev
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      API_URL: ${API_URL:-http://localhost:8000}
+      WS_URL: ${WS_URL:-ws://localhost:8000}
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public

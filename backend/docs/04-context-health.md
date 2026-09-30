@@ -387,6 +387,10 @@ class Settings(BaseSettings):
     # Origens do frontend autorizadas (CORS e handshake do WebSocket).
     # Via env, em JSON: APP_CORS_ORIGINS='["https://app.dominio.com.br"]'
     cors_origins: list[str] = ["http://localhost:3000"]
+    # DynamoDB (docs/12-persistencia-dynamodb.md). Endpoint vazio = endpoint da AWS.
+    aws_region: str = "sa-east-1"
+    dynamodb_endpoint_url: str | None = None
+    dynamodb_table_prefix: str = "bot-varejo-local"
 ```
 
 Todas as variáveis estão listadas em [08 — Docker e deploy](./08-docker-deploy.md#4-variáveis-de-ambiente).

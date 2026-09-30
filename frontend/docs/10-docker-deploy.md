@@ -20,7 +20,9 @@ ARG NODE_VERSION=24
 
 # ---------- base ---------------------------------------------------------------
 FROM node:${NODE_VERSION}-slim AS base
-ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH NEXT_TELEMETRY_DISABLED=1
+ENV PNPM_HOME=/pnpm \
+    PATH=/pnpm:$PATH \
+    NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable
 WORKDIR /app
 
@@ -65,28 +67,32 @@ Pontos importantes:
 - **Não-root** (usuário `node`, já existente na imagem oficial).
 - **Nenhuma URL da API no build**: `API_URL` e `WS_URL` são lidas em runtime ([07](./07-integracao-api.md#2-configuração-em-runtime)). A mesma imagem vai para todos os ambientes.
 - HEALTHCHECK usa o `fetch` nativo do Node 24 contra `/healthz` (sem `curl`).
-- `.dockerignore`: `node_modules`, `.next`, `coverage`, `playwright-report`, `test-results`, `docs/`, `.env*` (exceto `.env.example`).
+- `.dockerignore`: `node_modules`, `.next`, `coverage`, `playwright-report`, `test-results`, `docs/`, `.env*` (exceto `.env.example`) e os próprios arquivos Docker.
 
 ## 2. Docker Compose
 
 | Arquivo | Propósito | Comando |
 |---------|-----------|---------|
-| `docker-compose.yml` | Sobe a **imagem de runtime** (igual à produção). Profile opcional `api` sobe também o backend a partir do registry | `docker compose up --build` |
+| `docker-compose.yml` | Sobe `bot-varejo-web` com a **imagem de runtime** (igual à produção) | `docker compose up --build` |
 | `docker-compose.dev.yml` | `next dev` com hot reload e código montado | `docker compose -f docker-compose.dev.yml up --build` |
 
 ### `docker-compose.yml`
 
 ```yaml
+# Sobe o frontend com a imagem de runtime (igual à produção).
+# Uso: docker compose up --build
+# A API (e o banco) sobem pelo compose do repositório do backend, em http://localhost:8000.
 name: bot-varejo-frontend
 
 services:
-  frontend:
+  bot-varejo-web:
+    container_name: bot-varejo-web
     build:
       context: .
       target: runtime
-    image: bot-varejo-frontend:local
+    image: bot-varejo-web:local
     ports:
-      - "${FRONT_PORT:-3000}:3000"
+      - "${WEB_PORT:-3000}:3000"
     environment:
       # URLs vistas pelo NAVEGADOR (por isso localhost, e não o nome do serviço)
       API_URL: ${API_URL:-http://localhost:8000}
@@ -95,33 +101,31 @@ services:
       - path: .env
         required: false
     restart: unless-stopped
-
-  # Opcional: sobe o backend publicado no registry, para rodar o front sem clonar/rodar o backend.
-  # docker compose --profile api up
-  api:
-    profiles: ["api"]
-    image: ${BACKEND_IMAGE:-registry.gitlab.com/<grupo>/<repo-backend>}:${BACKEND_TAG:-developer}
-    ports:
-      - "${API_PORT:-8000}:8000"
-    environment:
-      APP_CORS_ORIGINS: '["http://localhost:${FRONT_PORT:-3000}"]'
 ```
 
 ### `docker-compose.dev.yml`
 
 ```yaml
+# Desenvolvimento local: next dev com hot reload (src/ e public/ montados).
+# Uso: docker compose -f docker-compose.dev.yml up --build
+# A API deve estar rodando (compose do backend) em http://localhost:8000.
 name: bot-varejo-frontend-dev
 
 services:
-  frontend:
+  bot-varejo-web:
+    container_name: bot-varejo-web-dev
     build:
       context: .
       target: dev
+    image: bot-varejo-web:dev
     ports:
-      - "${FRONT_PORT:-3000}:3000"
+      - "${WEB_PORT:-3000}:3000"
     environment:
       API_URL: ${API_URL:-http://localhost:8000}
       WS_URL: ${WS_URL:-ws://localhost:8000}
+    env_file:
+      - path: .env
+        required: false
     volumes:
       - ./src:/app/src
       - ./public:/app/public
@@ -133,21 +137,21 @@ services:
 
 ```mermaid
 flowchart LR
-    b["Navegador"] -->|"localhost:3000"| f["frontend<br/>(este compose)"]
-    b -->|"localhost:8000"| a["backend<br/>(compose do backend<br/>ou profile api)"]
+    b["Navegador"] -->|"localhost:3000"| f["bot-varejo-web<br/>(este compose)"]
+    b -->|"localhost:8000"| a["bot-varejo-api<br/>(compose do backend)"]
+    a --> d[("bot-varejo-dynamodb<br/>(compose do backend)")]
 ```
 
-| Cenário | Como |
-|---------|------|
-| Trabalhando nos dois projetos | `make dev` no repositório do backend + `make dev` aqui |
-| Só no front, sem mexer no backend | `docker compose --profile api up` (usa a imagem publicada do backend) |
+O frontend **não sobe API nem banco**: eles vêm do compose do repositório do **backend** (`bot-varejo-api` em `:8000` e `bot-varejo-dynamodb` em `:8001`).
+
+1. No repositório do backend: `docker compose -f docker-compose.dev.yml up --build`.
+2. Aqui: `docker compose -f docker-compose.dev.yml up --build`.
 
 ## 3. Portas
 
 | Porta | Onde | Exposta no host? |
 |-------|------|------------------|
-| 3000 | Next.js (runtime e dev) | ✅ (`FRONT_PORT`) |
-| 8000 | Backend (só com profile `api`) | ✅ (`API_PORT`) |
+| 3000 | `bot-varejo-web` (runtime e dev) | ✅ (`WEB_PORT`) |
 
 ## 4. Variáveis de ambiente
 
@@ -158,10 +162,8 @@ Documentadas também em `.env.example`.
 | `API_URL` | `http://localhost:8000` | ✅ (runtime) | Base REST da API, **como o navegador enxerga** |
 | `WS_URL` | `ws://localhost:8000` | ✅ (runtime) | Base WebSocket da API (`wss://` em produção) |
 | `PORT` | `3000` | — | Porta do servidor Next dentro do container |
-| `FRONT_PORT` | `3000` | — | Porta publicada no host (compose) |
-| `BACKEND_IMAGE` | `registry.gitlab.com/<grupo>/<repo-backend>` | — | Repositório da imagem do backend (profile `api` e E2E no CI) |
-| `BACKEND_TAG` | `developer` | — | Tag da imagem do backend no profile `api` (`developer`, `staging`, `master` ou `X.Y.Z`) |
-| `API_PORT` | `8000` | — | Porta do backend no profile `api` |
+| `WEB_PORT` | `3000` | — | Porta publicada no host (compose) |
+| `E2E_BASE_URL` | `http://localhost:3000` | — | Front testado pelos E2E; no CI, variável do ambiente ([13](./13-ci.md)) |
 | `OPENAPI_URL` | `http://localhost:8000/api/openapi.json` | — | Origem do contrato para `pnpm openapi` (ferramenta de dev) |
 
 > O front falha ao renderizar se `API_URL`/`WS_URL` não estiverem definidas — erro explícito em vez de apontar silenciosamente para o lugar errado.

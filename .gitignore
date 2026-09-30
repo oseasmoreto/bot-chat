@@ -1,0 +1,13 @@
+# Regras de cada projeto ficam em backend/.gitignore e frontend/.gitignore.
+# Aqui, só o que pode aparecer na raiz do repositório.
+
+.env
+.env.*
+!.env.example
+
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

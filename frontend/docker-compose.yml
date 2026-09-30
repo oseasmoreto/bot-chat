@@ -1,0 +1,22 @@
+# Sobe o frontend com a imagem de runtime (igual à produção).
+# Uso: docker compose up --build
+# A API (e o banco) sobem pelo compose do repositório do backend, em http://localhost:8000.
+name: bot-varejo-frontend
+
+services:
+  bot-varejo-web:
+    container_name: bot-varejo-web
+    build:
+      context: .
+      target: runtime
+    image: bot-varejo-web:local
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      # URLs vistas pelo NAVEGADOR (por isso localhost, e não o nome do serviço)
+      API_URL: ${API_URL:-http://localhost:8000}
+      WS_URL: ${WS_URL:-ws://localhost:8000}
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped

@@ -13,11 +13,12 @@ backend/
 ├── .python-version              # 3.13
 ├── openapi.json                 # contrato exportado (make openapi) — versionado, validado no CI
 ├── Dockerfile                   # multi-stage: dev, builder, runtime (python:3.13-slim)
-├── docker-compose.yml           # sobe a imagem de runtime (igual à produção)
-├── docker-compose.dev.yml       # desenvolvimento com --reload
+├── docker-compose.yml           # bot-varejo-api (runtime) + bot-varejo-dynamodb
+├── docker-compose.dev.yml       # bot-varejo-api (--reload) + bot-varejo-dynamodb
 ├── Makefile                     # make setup, up, dev, test, lint, openapi…
 ├── .env.example                 # todas as variáveis documentadas
 ├── .dockerignore
+├── .gitignore                   # arquivos fora do git (.venv, caches, .env…)
 ├── .gitlab-ci.yml               # pipeline: validate, lint, testes, build, publish
 ├── .gitlab/
 │   └── merge_request_templates/ # templates de MR do backend: Default, Bugfix, Hotfix, Docs

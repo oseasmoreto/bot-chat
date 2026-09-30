@@ -286,7 +286,7 @@ Registrado no container em `GetHealthUseCase(checks=(DynamoDbHealthCheck(db, con
 | Variável | Exemplo local | Na AWS | Descrição |
 |----------|---------------|--------|-----------|
 | `APP_AWS_REGION` | `sa-east-1` | região da conta (a definir) | Região do DynamoDB |
-| `APP_DYNAMODB_ENDPOINT_URL` | `http://dynamodb:8000` | *(vazio)* | Endpoint do DynamoDB Local; vazio usa o endpoint da AWS |
+| `APP_DYNAMODB_ENDPOINT_URL` | `http://bot-varejo-dynamodb:8000` | *(vazio)* | Endpoint do DynamoDB Local; vazio usa o endpoint da AWS |
 | `APP_DYNAMODB_TABLE_PREFIX` | `bot-varejo-local` | `bot-varejo-<ambiente>` | Prefixo dos nomes das tabelas |
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | `local` / `local` | **não usar** | Na AWS as credenciais vêm da **role IAM** do serviço; localmente qualquer valor serve |
 
@@ -294,29 +294,13 @@ Permissões IAM do serviço: `dynamodb:GetItem`, `PutItem`, `UpdateItem`, `Delet
 
 ## 7. Ambiente local
 
-Serviço adicional nos arquivos de compose:
+Os dois arquivos de compose sobem o banco junto com a API ([08 — Docker](./08-docker-deploy.md#2-docker-compose)):
 
-```yaml
-  dynamodb:
-    image: amazon/dynamodb-local:latest   # fixar a versão na implementação
-    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/home/dynamodblocal/data"]
-    ports:
-      - "${DYNAMODB_PORT:-8001}:8000"      # 8001 no host (8000 é a API)
-    volumes:
-      - dynamodb-data:/home/dynamodblocal/data
+| Serviço | Imagem | Endereço |
+|---------|--------|----------|
+| `bot-varejo-dynamodb` | `amazon/dynamodb-local:3.3.1` (`-sharedDb`, dados em volume) | `http://bot-varejo-dynamodb:8000` na rede do compose · `http://localhost:8001` no host |
 
-  api:
-    environment:
-      APP_DYNAMODB_ENDPOINT_URL: http://dynamodb:8000
-      APP_DYNAMODB_TABLE_PREFIX: bot-varejo-local
-      APP_AWS_REGION: sa-east-1
-      AWS_ACCESS_KEY_ID: local
-      AWS_SECRET_ACCESS_KEY: local
-    depends_on: [dynamodb]
-
-volumes:
-  dynamodb-data:
-```
+A API recebe `APP_DYNAMODB_ENDPOINT_URL=http://bot-varejo-dynamodb:8000`, `APP_DYNAMODB_TABLE_PREFIX=bot-varejo-local` e credenciais fictícias (`local`/`local`). Rodando a API fora do Docker, use `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001`.
 
 | Comando | O que faz |
 |---------|-----------|

@@ -1,0 +1,23 @@
+# Ambiente e caches
+.venv/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+report.xml
+
+# Fora da imagem
+docs/
+tests/
+.git/
+.gitlab/
+.env
+.env.*
+!.env.example
+docker-compose*.yml
+Dockerfile
+*.md

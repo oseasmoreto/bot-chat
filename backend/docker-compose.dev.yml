@@ -1,0 +1,44 @@
+# Desenvolvimento local: API com --reload (código montado) + DynamoDB Local.
+# Uso: docker compose -f docker-compose.dev.yml up --build
+name: bot-varejo-backend-dev
+
+services:
+  bot-varejo-api:
+    container_name: bot-varejo-api-dev
+    build:
+      context: .
+      target: dev
+    image: bot-varejo-api:dev
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./src:/app/src
+    environment:
+      APP_ENV: local
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL:-DEBUG}
+      APP_CORS_ORIGINS: '${APP_CORS_ORIGINS:-["http://localhost:3000"]}'
+      APP_AWS_REGION: ${APP_AWS_REGION:-sa-east-1}
+      APP_DYNAMODB_ENDPOINT_URL: http://bot-varejo-dynamodb:8000
+      APP_DYNAMODB_TABLE_PREFIX: ${APP_DYNAMODB_TABLE_PREFIX:-bot-varejo-local}
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      - bot-varejo-dynamodb
+
+  bot-varejo-dynamodb:
+    container_name: bot-varejo-dynamodb-dev
+    image: amazon/dynamodb-local:3.3.1
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/home/dynamodblocal/data"]
+    working_dir: /home/dynamodblocal
+    user: root                          # só local: permite gravar no volume nomeado
+    ports:
+      - "${DYNAMODB_PORT:-8001}:8000"   # 8001 no host; 8000 é a API
+    volumes:
+      - bot-varejo-dynamodb-dev-data:/home/dynamodblocal/data
+
+volumes:
+  bot-varejo-dynamodb-dev-data:
+    name: bot-varejo-dynamodb-dev-data   # nome fixo, sem prefixo do projeto compose
