@@ -25,8 +25,9 @@ backend/
 ├── .github/                     # GitHub Copilot (docs/14): instruções, prompts e agente
 │   ├── copilot-instructions.md  # regras gerais do projeto
 │   ├── instructions/            # regras por camada/pasta (*.instructions.md, applyTo)
-│   ├── prompts/                 # /novo-context, /novo-modulo, /novo-endpoint, /nova-mensagem-ws, /revisar-arquitetura
-│   └── agents/                  # backend-ddd.agent.md — agente especialista
+│   ├── prompts/                 # /novo-context, /novo-modulo, /novo-endpoint, /nova-mensagem-ws, /revisar-arquitetura,
+│   │                            # /documentar, /novo-adr, /revisar-docs
+│   └── agents/                  # backend-ddd.agent.md (código) e docs-backend.agent.md (documentação)
 ├── api/                         # código da aplicação (pacote Python `api`)
 │   ├── __init__.py
 │   ├── app_run.py               # create_app(): composição, middlewares, routers, handlers de erro
@@ -89,7 +90,8 @@ backend/
     │   ├── api/                 # test_health, test_cors, test_errors, test_request_id, test_docs
     │   └── websocket/           # test_health_ws
     └── contract/
-        └── test_openapi_schema.py   # openapi.json versionado = gerado
+        ├── test_openapi_schema.py   # openapi.json versionado = gerado
+        └── test_docs.py             # links dos docs válidos e código embutido = arquivos reais
 ```
 
 > **Pacote `api` na raiz do projeto:** o código não é instalado com pip; os comandos rodam **na raiz do projeto**, que já está no caminho de import (no Docker, `PYTHONPATH=/app`). Os imports são absolutos a partir do pacote: `from api.core.scope import Scope`.

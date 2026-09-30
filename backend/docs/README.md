@@ -58,3 +58,5 @@ No VS Code, o prompt `/novo-context` do Copilot executa este checklist ([14 — 
 2. Mudança de contrato → [06](./06-contratos-api.md) + `openapi.json` + ticket no frontend.
 3. Nova decisão → novo ADR; decisão alterada → reescreva o ADR com a decisão vigente. A documentação descreve só o estado atual — histórico fica no git.
 4. Diagramas em **Mermaid**, versionados e revisados em MR como código.
+5. Regras de escrita: [`.github/instructions/docs.instructions.md`](../.github/instructions/docs.instructions.md). No VS Code, o agente `docs-backend` do Copilot (`/documentar`, `/novo-adr`, `/revisar-docs`) segue essas regras ([14](./14-ia-copilot.md)).
+6. `make check` inclui `tests/contract/test_docs.py`: falha com link quebrado, âncora inexistente ou trecho de código diferente do arquivo real.

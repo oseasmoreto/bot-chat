@@ -96,7 +96,7 @@ Apresente e aguarde confirmação:
 4. **infrastructure:** adapters das ports (DynamoDB, HTTP) — ou *fake* em memória quando a persistência ainda não existir, deixando isso explícito.
 5. **presentation:** schemas `BaseSchema`, `dependencies.py`, router factory, handlers WS.
 6. **Composição:** `api/container.py` (campos + `build_container`), `api/routes/public.py`/`admin.py`, `dispatcher.register(...)`.
-7. **Contrato e docs:** regenerar `openapi.json`, atualizar `docs/06-contratos-api.md`, termos novos no `docs/glossario.md` e, se for context novo, `docs/01-arquitetura.md` (contexts) e `docs/02-estrutura.md` quando a árvore de referência mudar.
+7. **Contrato e docs:** regenerar `openapi.json`, atualizar `docs/06-contratos-api.md`, termos novos no `docs/glossario.md` e, se for context novo, `docs/01-arquitetura.md` (contexts) e `docs/02-estrutura.md` quando a árvore de referência mudar, seguindo [docs.instructions.md](../instructions/docs.instructions.md). Documentação mais ampla (guia, ADR) fica com o agente [docs-backend](./docs-backend.agent.md).
 
 ## Regras que você nunca quebra
 

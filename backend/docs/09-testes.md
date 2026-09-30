@@ -16,7 +16,7 @@ flowchart LR
 ```mermaid
 flowchart TB
     smoke["Smoke do container<br/>docker run + health"]
-    contract["Contrato<br/>openapi.json versionado = gerado"]
+    contract["Contrato<br/>openapi.json e docs = código"]
     integ["Integração<br/>rotas HTTP (httpx) e WebSocket (TestClient)"]
     unit["Unitários<br/>domínio e casos de uso com fakes<br/>rápidos e numerosos"]
     smoke --- contract --- integ --- unit
@@ -33,6 +33,7 @@ flowchart TB
 | **Mensagem WebSocket** | Integração: request → response, erros, `Origin` | Starlette `TestClient` (usa `httpx2`) | ✅ **todo `type`** |
 | CORS | Integração: origem permitida e negada | pytest + httpx | ✅ |
 | Contrato OpenAPI | `openapi.json` versionado = gerado | pytest | ✅ |
+| Documentação | Links e âncoras dos `.md` existem; trechos de código embutidos iguais aos arquivos (`tests/contract/test_docs.py`) | pytest | ✅ |
 | Imagem Docker | Smoke: container sobe e health responde 200 | `docker run` + `curl` | ✅ |
 
 > Os testes de tela e E2E do navegador pertencem ao frontend (`docs/11-testes.md` no repositório do **frontend**).
@@ -60,7 +61,9 @@ flowchart TB
 ### `tests/fakes.py` e `tests/conftest.py`
 
 ```python
-# tests/fakes.py — dublês que implementam as ports (Protocol) do domínio
+# tests/fakes.py
+"""Dublês que implementam as ports (Protocol) do domínio."""
+
 from datetime import UTC, datetime
 
 from api.contexts.health.domain.entities import ComponentHealth

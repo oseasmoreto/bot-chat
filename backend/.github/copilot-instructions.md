@@ -90,7 +90,7 @@ docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/app -w /app bot-v
 
 ## Documentação
 
-Toda mudança de comportamento atualiza os docs no mesmo MR: endpoint/mensagem nova em `docs/06-contratos-api.md` + `openapi.json`; context novo em `docs/01-arquitetura.md` (evolução) quando aplicável; lib nova em `docs/13-dependencias.md`. Docs descrevem só o estado atual.
+Toda mudança de comportamento atualiza os docs no mesmo MR: endpoint/mensagem nova em `docs/06-contratos-api.md` + `openapi.json`; context novo em `docs/01-arquitetura.md` (evolução) quando aplicável; lib nova em `docs/13-dependencias.md`. Docs descrevem só o estado atual. Regras de escrita em [docs.instructions.md](instructions/docs.instructions.md); tarefas só de documentação usam o agente [docs-backend](agents/docs-backend.agent.md) (`/documentar`, `/novo-adr`, `/revisar-docs`). O teste `tests/contract/test_docs.py` valida links e trechos de código dos docs.
 
 ## Commits
 
