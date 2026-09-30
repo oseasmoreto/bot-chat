@@ -4,8 +4,8 @@ As dependências ficam em dois arquivos na raiz do projeto, instalados com **pip
 
 | Arquivo | Conteúdo | Instalado em |
 |---------|----------|--------------|
-| `requirements.txt` | Dependências de **runtime** — tudo o que a aplicação importa | Imagem de produção (estágio `builder`), dev, CI |
-| `requirements-test.txt` | `-r requirements.txt` + testes + qualidade | Dev (`.venv` e estágio `dev` do Docker), CI — **nunca** na imagem de produção |
+| `requirements.txt` | Dependências de **runtime** — tudo o que a aplicação importa | Imagem de produção (estágio `builder`) e ambiente de desenvolvimento |
+| `requirements-test.txt` | `-r requirements.txt` + testes + qualidade | Desenvolvimento (`.venv` e estágio `dev` do Docker) — **nunca** na imagem de produção |
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,6 @@ flowchart LR
     rt --> tst["requirements-test.txt<br/>-r requirements.txt<br/>+ testes + qualidade"]
     tst --> venv[".venv local"]
     tst --> dev["estágio dev do Docker"]
-    tst --> ci["jobs de lint e testes do CI"]
 ```
 
 ## 1. Runtime — `requirements.txt`
@@ -52,7 +51,7 @@ flowchart LR
 
 | Regra | Por quê |
 |-------|---------|
-| Toda versão fixada com `==` | Build reproduzível: o que passou no CI é o que vai para produção |
+| Toda versão fixada com `==` | Build reproduzível: o que passou nos testes é o que vai para produção |
 | Lib de runtime em `requirements.txt`; de teste/ferramenta em `requirements-test.txt` | A imagem de produção só leva o necessário |
 | Dependência transitiva só é fixada quando precisa de controle (segurança, compatibilidade), com comentário do motivo | Evita arquivo inflado e conflitos de resolução |
 | Lib de infraestrutura (AWS, HTTP, parceiros) só em `infrastructure/` ou `core/` | Domínio sem framework nem AWS — verificado pelo import-linter ([03](./03-arquitetura-ddd.md)) |
@@ -62,12 +61,14 @@ flowchart LR
 
 1. Branch `build/CPBS-123-descricao` (ou dentro da feature que precisa da lib).
 2. Adicionar/alterar a linha no arquivo certo, com versão fixada e, se não for óbvio, um comentário de uso.
-3. Instalar e validar localmente:
+3. Instalar e validar localmente (com o venv ativado — [11](./11-comandos.md#1-ambiente-virtual-venv)):
 
    ```bash
-   .venv/bin/pip install -r requirements-test.txt
-   PYTHONPATH=. .venv/bin/coverage run -m pytest && .venv/bin/coverage report
+   pip install -r requirements-test.txt
+   coverage run -m pytest && coverage report
    ```
+
+   Com `make`: `make install && make check`.
 
 4. Recriar o container de dev: `docker compose -f docker-compose.dev.yml up --build` (deps ficam na imagem).
 5. Atualizar a tabela deste documento.

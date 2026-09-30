@@ -29,7 +29,7 @@
 | **GSI** | Global Secondary Index: índice alternativo (`GSI1PK`/`GSI1SK`) para outro padrão de acesso |
 | **Single-table design** | Várias entidades na mesma tabela, com chaves genéricas e `entityType` |
 | **Padrão de acesso** | Consulta que o sistema precisa fazer; define as chaves e índices da tabela |
-| **DynamoDB Local** | Emulador oficial do DynamoDB usado no desenvolvimento, testes e CI |
+| **DynamoDB Local** | Emulador oficial do DynamoDB usado no desenvolvimento e nos testes |
 | **CORS** | Mecanismo do navegador que exige autorização da API para chamadas de outra origem |
 | **Origin** | Header enviado pelo navegador com o domínio da página; validado no handshake WS |
 | **Envelope WS** | Formato padrão de mensagem WebSocket: `type`, `id`, `payload` |

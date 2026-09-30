@@ -1,4 +1,4 @@
-# 08 — Docker e deploy (backend)
+# 08 — Docker (backend)
 
 Imagem própria do backend, baseada em **`python:3.13-slim`**, rodando **Uvicorn diretamente** — um processo por container ([ADR-0001](./adr/0001-imagem-python-uvicorn.md)). TLS e domínio (`api.<dominio>`) ficam na plataforma de deploy (load balancer/ingress).
 
@@ -219,7 +219,7 @@ Documentadas também em `.env.example`.
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
 | `APP_ENV` | `local` | `local` · `dev` · `staging` · `production` |
-| `APP_VERSION` | `0.0.0-local` | Versão exibida no health e no OpenAPI (injetada no build pela tag) |
+| `APP_VERSION` | `0.0.0-local` | Versão exibida no health e no OpenAPI (na imagem: `--build-arg APP_VERSION=X.Y.Z`) |
 | `APP_LOG_LEVEL` | `INFO` | `DEBUG` · `INFO` · `WARNING` · `ERROR` |
 | `APP_DOCS_ENABLED` | `true` | Liga `/api/docs`, `/api/redoc`, `/api/openapi.json` |
 | `APP_CORS_ORIGINS` | `["http://localhost:3000"]` | Origens do frontend (JSON). Vale para CORS e para o `Origin` do WebSocket |
@@ -231,22 +231,4 @@ Documentadas também em `.env.example`.
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | `local` (só local) | Na AWS, credenciais vêm da role IAM |
 | `DYNAMODB_PORT` | `8001` | Porta do DynamoDB Local no host (compose) |
 
-## 5. Entrega por ambiente
-
-Cada branch permanente publica no seu ambiente ([CONTRIBUTING §1](../CONTRIBUTING.md#1-branches-e-fluxo-de-publicação)):
-
-```mermaid
-flowchart LR
-    mr["MR de trabalho<br/>merge na developer"] --> dev["developer<br/>imagem :developer<br/>deploy development"]
-    dev -->|"MR de promoção"| stg["staging<br/>imagem :staging<br/>deploy staging"]
-    stg -->|"MR de promoção"| mst["master<br/>imagem :master"]
-    mst -->|"tag backend-vX.Y.Z"| prod["imagem :X.Y.Z<br/>deploy production<br/>(aprovação manual)"]
-```
-
-| Ambiente | Branch | Imagem | URL (convenção) | Deploy |
-|----------|--------|--------|-----------------|--------|
-| development | `developer` | `backend:developer` | `https://api-dev.<dominio>` | automático |
-| staging | `staging` | `backend:staging` | `https://api-staging.<dominio>` | automático |
-| production | `master` (tag) | `backend:X.Y.Z` | `https://api.<dominio>` | manual (aprovação) |
-
-A mesma imagem roda em qualquer ambiente: o que muda são as **variáveis de ambiente** configuradas em cada um (§4). Detalhes do pipeline em [11 — CI](./11-ci.md).
+A mesma imagem roda em qualquer ambiente: o que muda são as **variáveis de ambiente** configuradas em cada um (§4).

@@ -1,5 +1,5 @@
 <!--
-  FRONTEND — template padrão (feat, refactor, perf, test, build, ci, chore).
+  FRONTEND — template padrão (feat, refactor, perf, test, build, chore).
   Título do MR = cabeçalho no padrão de commit, ex.: feat(admin): adiciona tela de status
   Destino: developer · branch criada a partir da developer · merge commit (sem squash).
   Escopos: web · admin · frontend (shared, features comuns, config, Docker)
@@ -25,7 +25,7 @@ CPBS-
 - [ ] Área **admin** (`src/app/admin`, `src/areas/admin`)
 - [ ] Feature comum (`src/features/`) — qual:
 - [ ] `src/shared/` (ui, api, ws, config, providers)
-- [ ] Docker / compose / CI / configs (`next.config.ts`, eslint, tsconfig)
+- [ ] Docker / compose / configs (`next.config.ts`, eslint, tsconfig)
 - [ ] Documentação (`docs/`)
 
 ## 🖥️ Telas
@@ -43,7 +43,7 @@ CPBS-
 ## ⚙️ Configuração
 
 - [ ] Sem novas variáveis de ambiente
-- [ ] Novas variáveis (runtime) documentadas em `.env.example` e `docs/10-docker-deploy.md`: <!-- quais -->
+- [ ] Novas variáveis (runtime) documentadas em `.env.example` e `docs/10-docker.md`: <!-- quais -->
 
 ## 🧪 Como testar
 

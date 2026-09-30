@@ -202,6 +202,6 @@ Como front e back são implantados separadamente, **nenhuma mudança pode quebra
 - Disponível em `/api/docs` (Swagger UI), `/api/redoc` e `/api/openapi.json`.
 - Tags: `public`, `admin` (escopo) e `health` (context) — o Swagger agrupa por elas.
 - Controlado por `APP_DOCS_ENABLED` (padrão `true`; em produção pode ser desligado ou protegido quando existir auth).
-- Uma cópia é versionada em `openapi.json` na raiz do repositório (`make openapi`) e **o CI falha se ela divergir do código** (teste de contrato em `tests/contract/`) — assim toda mudança de contrato aparece no diff do MR.
+- Uma cópia é versionada em `openapi.json` na raiz do repositório (`make openapi`) e **o teste de contrato falha se ela divergir do código** (`tests/contract/`) — assim toda mudança de contrato aparece no diff do MR.
 - O frontend gera seus tipos a partir do `/api/openapi.json` publicado pela API (local ou ambiente de dev) — ver `docs/07-integracao-api.md` no repositório do **frontend**.
 - Cada rota deve declarar `summary`, `operation_id` e as respostas não-2xx relevantes (`responses=`).

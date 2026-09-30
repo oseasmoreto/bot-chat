@@ -180,12 +180,12 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Resumo:
 
 ```text
 branch:    feat/CPBS-123-descricao-curta                        ← sai da developer
-commit:    feat(admin): adiciona tela de status      ← escopos: web admin frontend | ci deps repo
+commit:    feat(admin): adiciona tela de status      ← escopos: web admin frontend | deps repo
            (linha em branco)
            Refs: CPBS-123
-MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · pipeline verde
+MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · lint, tipos e testes verdes
 publicar:  developer → staging → master   (MRs de promoção, template Release)
-tag:       frontend-vX.Y.Z na master → deploy em production (aprovação manual)
+tag:       frontend-vX.Y.Z na master (versão de production)
 ```
 
 - Template de commit: [`.gitmessage`](./.gitmessage) (ativado com `git config commit.template .gitmessage` — ver [Configuração](#configuração)).

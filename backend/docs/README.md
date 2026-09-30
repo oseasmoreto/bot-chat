@@ -17,10 +17,10 @@ API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio 
 | 05 | [WebSocket](./05-websocket.md) | Validação de `Origin`, dispatcher, handlers |
 | 06 | [Contratos de API](./06-contratos-api.md) | URLs, endpoints, schemas, CORS, protocolo WS, evolução do contrato, OpenAPI |
 | 07 | [Erros e logging](./07-erros-logging.md) | Formato de erro, log estruturado, `X-Request-ID` |
-| 08 | [Docker e deploy](./08-docker-deploy.md) | Dockerfile, compose, variáveis de ambiente |
+| 08 | [Docker](./08-docker.md) | Dockerfile, compose, portas, variáveis de ambiente |
 | 09 | [Testes](./09-testes.md) | TDD, matriz obrigatória, exemplos (unitário, rota, CORS, WS, contrato, smoke) |
 | 10 | [Padrões de código](./10-padroes-codigo.md) | Nomenclatura, convenções de API, tipagem, lint, `pyproject.toml` |
-| 11 | [CI e comandos](./11-ci.md) | Pipeline por ambiente (developer, staging, master), deploy, Makefile |
+| 11 | [Comandos](./11-comandos.md) | Ambiente virtual (Linux, macOS, Windows), Makefile e comandos equivalentes |
 | 12 | [Persistência (DynamoDB)](./12-persistencia-dynamodb.md) | Tabela por context, chaves e índices, repositórios, config, ambiente local, testes |
 | 13 | [Dependências](./13-dependencias.md) | `requirements.txt` e `requirements-test.txt`: cada lib, para que serve, onde pode ser usada, como adicionar/atualizar |
 | 14 | [IA — GitHub Copilot](./14-ia-copilot.md) | Instruções, prompts e agente do Copilot no VS Code para criar contexts, módulos e APIs |

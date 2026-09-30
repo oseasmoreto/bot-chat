@@ -24,7 +24,7 @@ config/               # deploy/infra da plataforma — NÃO alterar
 certificates/         # certificados de CA (.crt) — nunca chaves privadas
 ```
 
-Imports sempre absolutos a partir de `api` (`from api.core.scope import Scope`). O código não é instalado: `PYTHONPATH` = raiz do projeto.
+Imports sempre absolutos a partir de `api` (`from api.core.scope import Scope`). O código não é instalado: rode tudo na raiz do projeto.
 
 ## Regras de arquitetura (verificadas pelo import-linter)
 
@@ -50,7 +50,7 @@ Imports sempre absolutos a partir de `api` (`from api.core.scope import Scope`).
 - Tipagem: `mypy --strict`; toda função anotada; `@dataclass(frozen=True, slots=True, kw_only=True)` no domínio; `Any` só na fronteira, comentado; `# type: ignore[código]  # motivo`.
 - `async def` em rotas, casos de uso e adapters de I/O; nada bloqueante no event loop.
 - Comentários explicam o **porquê**; sem código morto ou comentado; sem `print`.
-- Configuração nova = campo no `Settings` (`api/config.py`) + `.env.example` + tabela de variáveis em `docs/08-docker-deploy.md`. Nunca leia `os.environ` direto.
+- Configuração nova = campo no `Settings` (`api/config.py`) + `.env.example` + tabela de variáveis em `docs/08-docker.md`. Nunca leia `os.environ` direto.
 
 ## Testes (TDD, obrigatório)
 
@@ -64,18 +64,24 @@ Imports sempre absolutos a partir de `api` (`from api.core.scope import Scope`).
 
 ## Validação antes de concluir
 
-Na raiz do projeto, com o `.venv` (`python3.13 -m venv .venv && .venv/bin/pip install -r requirements-test.txt`):
+Na raiz do projeto. Com `make` (Linux, macOS, WSL ou Git Bash no Windows):
 
 ```bash
-export PYTHONPATH=.
-.venv/bin/ruff format . && .venv/bin/ruff check --fix .
-.venv/bin/mypy api tests
-.venv/bin/lint-imports
-.venv/bin/coverage run -m pytest && .venv/bin/coverage report
-.venv/bin/python -m api.scripts.export_openapi openapi.json   # se o contrato HTTP mudou
+make format && make check     # ruff, mypy, lint-imports, pytest com cobertura
+make openapi                  # se o contrato HTTP mudou
 ```
 
-Sem `.venv`, pela imagem de dev (`docker compose -f docker-compose.dev.yml build bot-varejo-api` uma vez):
+Sem `make`, com o venv ativado (`source .venv/bin/activate` no Linux/macOS, `source .venv/Scripts/activate` no Git Bash, `.venv\Scripts\Activate.ps1` no PowerShell — criar/instalar em [docs/11](../docs/11-comandos.md)):
+
+```bash
+ruff format . && ruff check --fix .
+mypy api tests
+lint-imports
+coverage run -m pytest && coverage report
+python -m api.scripts.export_openapi openapi.json   # se o contrato HTTP mudou
+```
+
+Sem ambiente Python local, pela imagem de dev (`docker compose -f docker-compose.dev.yml build bot-varejo-api` uma vez):
 
 ```bash
 docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/app -w /app bot-varejo-api:dev \

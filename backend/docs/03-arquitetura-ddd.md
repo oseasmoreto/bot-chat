@@ -37,7 +37,7 @@ flowchart TB
 | `routes/` | `presentation` de todos os contexts | — | Agrupa routers por escopo (`public`/`admin`) e define prefixos |
 | `app_run.py` / `container.py` | tudo | — | **Composition root**: instancia adapters e injeta nos casos de uso |
 
-Essas fronteiras são verificadas pelo **import-linter** (`lint-imports`, contratos em `pyproject.toml`) localmente e no CI. Os contratos usam `api.contexts.*`: todo context novo é coberto sem editar o `pyproject.toml`, e precisa ter as quatro camadas. Um context também não importa código de outro context.
+Essas fronteiras são verificadas pelo **import-linter** (`lint-imports`, contratos em `pyproject.toml`). Os contratos usam `api.contexts.*`: todo context novo é coberto sem editar o `pyproject.toml`, e precisa ter as quatro camadas. Um context também não importa código de outro context.
 
 ```toml
 # pyproject.toml (trecho)

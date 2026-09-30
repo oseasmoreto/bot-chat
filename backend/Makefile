@@ -1,8 +1,13 @@
-# Atalhos do dia a dia. Comandos equivalentes sem make: README.md e docs/11-ci.md.
+# Atalhos do dia a dia. Comandos equivalentes sem make: docs/11-comandos.md.
+# Funciona no Linux, macOS, WSL e no Git Bash do Windows.
+VENV := .venv
+ifeq ($(OS),Windows_NT)
+PYTHON ?= python
+BIN    := $(VENV)/Scripts
+else
 PYTHON ?= python3.13
-VENV   := .venv
 BIN    := $(VENV)/bin
-export PYTHONPATH := .
+endif
 
 .DEFAULT_GOAL := help
 .PHONY: help setup install up down dev run test lint format typecheck check openapi build
@@ -10,11 +15,11 @@ export PYTHONPATH := .
 help: ## Lista os alvos
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
 
-$(BIN)/python:
+$(VENV)/pyvenv.cfg:
 	$(PYTHON) -m venv $(VENV)
 
-install: $(BIN)/python ## Instala as dependências (runtime + testes e qualidade) no .venv
-	$(BIN)/pip install -r requirements-test.txt
+install: $(VENV)/pyvenv.cfg ## Cria o .venv e instala as dependências (runtime + testes e qualidade)
+	$(BIN)/python -m pip install -r requirements-test.txt
 
 setup: install ## Prepara o clone: dependências, hooks e template de commit
 	$(BIN)/pre-commit install
@@ -49,7 +54,7 @@ format: ## Formata e aplica correções automáticas
 typecheck: ## mypy --strict
 	$(BIN)/mypy api tests
 
-check: lint typecheck test ## Tudo o que o CI valida
+check: lint typecheck test ## Validação completa: lint, tipos e testes
 
 openapi: ## Atualiza o openapi.json versionado
 	$(BIN)/python -m api.scripts.export_openapi openapi.json

@@ -19,10 +19,10 @@ Um único app **Next.js** (servidor padrão, usado como SPA) servido em `app.<do
 | 07 | [Integração com a API](./07-integracao-api.md) | Config em runtime, cliente HTTP tipado, WebSocket, CORS, `pnpm openapi` |
 | 08 | [Feature `health`](./08-feature-health.md) | Código de referência da tela de status |
 | 09 | [Estilo e TypeScript](./09-estilo-e-typescript.md) | Tailwind v4, tema, `tsconfig` |
-| 10 | [Docker e deploy](./10-docker-deploy.md) | Dockerfile, compose, variáveis |
+| 10 | [Docker](./10-docker.md) | Dockerfile, compose, variáveis |
 | 11 | [Testes](./11-testes.md) | TDD, matriz obrigatória, infraestrutura, exemplos, E2E |
 | 12 | [Padrões de código](./12-padroes-codigo.md) | Nomenclatura camelCase, tipagem, boas práticas, lint |
-| 13 | [CI e comandos](./13-ci.md) | Pipeline por ambiente (developer, staging, master), E2E, deploy, scripts, Makefile |
+| 13 | [Comandos](./13-comandos.md) | Scripts do `package.json`, Makefile, E2E contra outro ambiente |
 | — | [Tarefas](./tasks/README.md) | Objetivo, critérios de aceitação e escopo de cada tarefa |
 | — | [ADRs](./adr/README.md) | Decisões de arquitetura do frontend |
 | — | [Glossário](./glossario.md) | Termos de negócio e técnicos |

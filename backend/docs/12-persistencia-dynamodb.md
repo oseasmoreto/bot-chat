@@ -308,7 +308,7 @@ Permissões IAM do serviço: `dynamodb:GetItem`, `PutItem`, `UpdateItem`, `Delet
 
 ## 7. Ambiente local
 
-Os dois arquivos de compose sobem o banco junto com a API ([08 — Docker](./08-docker-deploy.md#2-docker-compose)):
+Os dois arquivos de compose sobem o banco junto com a API ([08 — Docker](./08-docker.md#2-docker-compose)):
 
 | Serviço | Imagem | Endereço |
 |---------|--------|----------|
@@ -347,4 +347,3 @@ async def dynamodb(settings_for_tests: Settings) -> AsyncIterator[DynamoDbResour
         await db.close()
 ```
 
-No CI, o job de testes sobe o DynamoDB Local como *service* ([11 — CI](./11-ci.md)).

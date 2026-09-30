@@ -429,4 +429,4 @@ class Settings(BaseSettings):
     dynamodb_table_prefix: str = "bot-varejo-local"
 ```
 
-Todas as variáveis estão listadas em [08 — Docker e deploy](./08-docker-deploy.md#4-variáveis-de-ambiente).
+Todas as variáveis estão listadas em [08 — Docker](./08-docker.md#4-variáveis-de-ambiente).

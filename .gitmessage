@@ -11,8 +11,8 @@
 # Refs: CPBS-<numero>
 # BREAKING CHANGE: <o que quebra e como migrar>   (só se houver; use "!" no cabeçalho)
 #
-# Tipos:   feat fix perf refactor test docs style build ci chore revert
-# Escopos: backend | frontend web admin | ci deps repo | release (só título de promoção)
+# Tipos:   feat fix perf refactor test docs style build chore revert
+# Escopos: backend | frontend web admin | deps repo | release (só título de promoção)
 # Fluxo:   branch de trabalho (sai da developer) → MR developer (merge commit)
 #          → promoção developer → staging → master (template Release) → tag
 # Regra:   um commit não mistura backend e frontend

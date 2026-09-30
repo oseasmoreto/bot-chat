@@ -2,7 +2,7 @@
 
 Plataforma de atendimento, via chat, de serviços de parceiros de varejo.
 
-Este repositório contém **dois projetos independentes**. Cada um tem seu próprio README, CONTRIBUTING, `.gitmessage`, documentação, ADRs, templates de MR, Dockerfile, docker compose, Makefile e pipeline.
+Este repositório contém **dois projetos independentes**. Cada um tem seu próprio README, CONTRIBUTING, `.gitmessage`, documentação, ADRs, templates de MR, Dockerfile, docker compose e Makefile.
 
 | Projeto | Stack | Domínio | Imagem | Documentação |
 |---------|-------|---------|--------|--------------|
@@ -48,13 +48,12 @@ bot-varejo/
 ├── README.md                 # este arquivo
 ├── CONTRIBUTING.md           # padrão de branches, commits, MRs e versionamento
 ├── .gitmessage               # template de mensagem de commit
-├── .gitlab-ci.yml            # orquestra: valida o MR e inclui o CI de cada projeto
 ├── commitlint.config.mjs     # regras de commit (a criar na implementação)
 ├── .pre-commit-config.yaml   # hooks de commit/push e lint por projeto (a criar)
 ├── scripts/
 │   └── check-branch-name.sh  # validação do nome da branch (a criar)
-├── backend/                  # projeto backend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose, CI
-└── frontend/                 # projeto frontend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose, CI
+├── backend/                  # projeto backend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose
+└── frontend/                 # projeto frontend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose
 ```
 
 ## Contribuindo
@@ -64,10 +63,10 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Cada projeto tem também o seu guia
 ```text
 branches:  developer (development) → staging (homologação) → master (production) — todas protegidas
 branch:    feat/CPBS-123-descricao-curta  (sai da developer)
-commit:    feat(backend): adiciona health check por escopo   ← escopos: backend | frontend, web, admin | ci, deps, repo | release
+commit:    feat(backend): adiciona health check por escopo   ← escopos: backend | frontend, web, admin | deps, repo | release
            (linha em branco)
            Refs: CPBS-123
-MR:        → developer · merge commit (sem squash) · um projeto por MR · template do projeto · pipeline verde
+MR:        → developer · merge commit (sem squash) · um projeto por MR · template do projeto · validação local verde
 publicar:  MRs de promoção developer → staging → master (template Release)
 tags:      backend-vX.Y.Z · frontend-vX.Y.Z (na master)
 ```

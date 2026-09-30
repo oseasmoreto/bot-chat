@@ -88,7 +88,7 @@ Tarefas pequenas sem decisão de contrato ou modelo (typo, renomear variável lo
 
 ## 4. Validação das regras
 
-As instruções orientam o Copilot; quem **garante** as regras é a pipeline. O que o Copilot gerar passa pelas mesmas verificações de qualquer código:
+As instruções orientam o Copilot; quem **garante** as regras são as ferramentas de validação. O que o Copilot gerar passa pelas mesmas verificações de qualquer código:
 
 | Regra | Verificada por |
 |-------|----------------|

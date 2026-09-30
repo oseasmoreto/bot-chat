@@ -1,6 +1,6 @@
 # 02 — Estrutura de pastas (frontend)
 
-O frontend é um **projeto independente**: tem seu próprio README, docs, Dockerfile, docker compose, Makefile e pipeline. Nada aqui depende do código do backend — a única ligação é o contrato HTTP/WS, consumido via `openapi.json` baixado da API ([07](./07-integracao-api.md)).
+O frontend é um **projeto independente**: tem seu próprio README, docs, Dockerfile, docker compose e Makefile. Nada aqui depende do código do backend — a única ligação é o contrato HTTP/WS, consumido via `openapi.json` baixado da API ([07](./07-integracao-api.md)).
 
 ```text
 frontend/
@@ -25,7 +25,6 @@ frontend/
 ├── .env.example                    # todas as variáveis documentadas
 ├── .dockerignore
 ├── .gitignore                      # arquivos fora do git (node_modules, .next, .env…)
-├── .gitlab-ci.yml                  # pipeline: validate, lint, testes, build, e2e, publish
 ├── .gitlab/
 │   └── merge_request_templates/    # templates de MR do frontend: Default, Bugfix, Docs, Hotfix, Release
 ├── scripts/

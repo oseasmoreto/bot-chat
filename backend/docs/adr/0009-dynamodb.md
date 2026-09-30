@@ -13,7 +13,7 @@ O backend vai persistir conversas, fluxos, parceiros, serviços e integrações.
 - Nome das tabelas: `<APP_DYNAMODB_TABLE_PREFIX>-<context>` (ex.: `bot-varejo-production-partners`).
 - Capacidade **on-demand** (`PAY_PER_REQUEST`); **Point-in-Time Recovery** e **deletion protection** em staging e production.
 - Concorrência por **locking otimista** (atributo `version` + `ConditionExpression`).
-- **DynamoDB Local** (`amazon/dynamodb-local`) no desenvolvimento, nos testes de integração e no CI.
+- **DynamoDB Local** (`amazon/dynamodb-local`) no desenvolvimento e nos testes de integração.
 - Tabelas na AWS provisionadas por infraestrutura como código (ferramenta a definir); localmente, por `make db-init` a partir das mesmas definições.
 
 Detalhes: [12 — Persistência (DynamoDB)](../12-persistencia-dynamodb.md).

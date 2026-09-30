@@ -21,7 +21,7 @@ Criar a **fundação do app**: estrutura por áreas e features, padrões, empaco
 | 1 | Estrutura de pastas do projeto | [02 — Estrutura](../02-estrutura.md) |
 | 2 | Comunicação com o health dos escopos `public` e `admin` | [07 — Integração com a API](../07-integracao-api.md) · [08 — Feature health](../08-feature-health.md) |
 | 3 | README com passo a passo para rodar localmente | [README do frontend](../../README.md) |
-| 4 | Docker Compose subindo o app | [10 — Docker e deploy](../10-docker-deploy.md) |
+| 4 | Docker Compose subindo o app | [10 — Docker](../10-docker.md) |
 
 ## Definição de pronto (DoD)
 

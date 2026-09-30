@@ -1,5 +1,5 @@
 <!--
-  BACKEND — template padrão (feat, refactor, perf, test, build, ci, chore).
+  BACKEND — template padrão (feat, refactor, perf, test, build, chore).
   Título do MR = cabeçalho no padrão de commit, ex.: feat(backend): adiciona health check por escopo
   Destino: developer · branch criada a partir da developer · merge commit (sem squash).
   Guia: CONTRIBUTING.md · Docs: docs/README.md
@@ -27,7 +27,7 @@ CPBS-
 - [ ] WebSocket — mensagens (`/api/v1/ws/public`, `/api/v1/ws/admin`)
 - [ ] `core/` (config, erros, logging, CORS, dispatcher)
 - [ ] Persistência (DynamoDB: tabelas, chaves, índices, repositórios)
-- [ ] Docker / compose / CI
+- [ ] Docker / compose
 - [ ] Documentação (`docs/`)
 
 **Escopos da API afetados:** <!-- public / admin / ambos / nenhum -->
@@ -43,7 +43,7 @@ CPBS-
 ## ⚙️ Configuração
 
 - [ ] Sem novas variáveis de ambiente
-- [ ] Novas variáveis documentadas em `.env.example` e `docs/08-docker-deploy.md`: <!-- quais -->
+- [ ] Novas variáveis documentadas em `.env.example` e `docs/08-docker.md`: <!-- quais -->
 - [ ] Mudou `APP_CORS_ORIGINS` / regras de CORS ou `Origin` do WS: <!-- o quê -->
 - [ ] Tabela ou índice novo no DynamoDB: definição em `core/dynamodb/tables.py` + padrões de acesso documentados + IaC dos ambientes: <!-- quais -->
 

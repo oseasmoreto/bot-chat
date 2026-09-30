@@ -30,12 +30,33 @@ flowchart LR
 
 | Ferramenta | Versão | Obrigatória para |
 |------------|--------|------------------|
-| Docker Engine + Docker Compose v2 | Compose ≥ 2.24 | Rodar a API e o banco (caminho recomendado) |
-| Python + venv | 3.13 (`python3.13 -m venv` — no Debian/Ubuntu: `sudo apt install python3.13-venv`) | Rodar sem Docker, testes e lint |
-| make | qualquer | *(opcional)* atalhos do `Makefile` — todo comando também está escrito por extenso abaixo |
+| Docker Engine + Docker Compose v2 (Windows/macOS: Docker Desktop) | Compose ≥ 2.24 | Rodar a API e o banco (caminho recomendado) |
+| Git (Windows: **Git for Windows**, que traz o Git Bash) | — | Clonar e contribuir |
+| Python | 3.13 (Windows: instalador do python.org marcando *Add python.exe to PATH*; Debian/Ubuntu: `sudo apt install python3.13 python3.13-venv`) | Rodar sem Docker, testes e lint |
+| make | qualquer | *(opcional)* atalhos do `Makefile` — ver [Instalando o make](#instalando-o-make); todo comando também está escrito por extenso |
 | websocat, AWS CLI | — | *(opcionais)* testar WebSocket e inspecionar o DynamoDB Local |
 
 > **Linux/WSL:** seu usuário precisa estar no grupo `docker` — `sudo usermod -aG docker $USER` e abra um novo terminal. Sem isso aparece `permission denied … docker.sock`.
+
+### Instalando o make
+
+**Windows** — escolha **uma** das opções, depois **feche e abra de novo** o Git Bash (ou o PowerShell) e confira com `make --version`:
+
+| Opção | Comando | Observação |
+|-------|---------|------------|
+| winget (já vem no Windows 10/11) | `winget install ezwinports.make` | Recomendada; não precisa de administrador |
+| Chocolatey | `choco install make` | Rodar o PowerShell **como administrador** |
+| Scoop | `scoop install make` | Se você já usa o Scoop |
+
+Se o `make --version` ainda não for encontrado:
+
+1. Descubra onde ele foi instalado: no PowerShell, `Get-Command make` (ou procure `make.exe` em `%LOCALAPPDATA%\Microsoft\WinGet\Links`, `C:\ProgramData\chocolatey\bin` ou `~\scoop\shims`).
+2. Adicione essa pasta ao PATH: menu Iniciar → "Editar as variáveis de ambiente do sistema" → *Variáveis de Ambiente* → *Path* (do usuário) → *Novo*.
+3. Feche e abra o terminal de novo.
+
+Use o `make` pelo **Git Bash**: o Makefile usa comandos de shell (`grep`, `awk`) que o Git Bash já traz. Ele detecta o Windows sozinho (usa `.venv/Scripts`) e chama `python`; se o seu `python` não for o 3.13, rode `make install PYTHON="py -3.13"`.
+
+**Linux / WSL:** `sudo apt install make` · **macOS:** `xcode-select --install`.
 
 ## Configuração
 
@@ -54,15 +75,39 @@ flowchart LR
 
    O `.env` é lido pelo Docker Compose (portas e variáveis `APP_*`) e pela aplicação. O endereço do banco (`APP_DYNAMODB_ENDPOINT_URL`) já é definido pelo compose; só precisa ir no `.env` quando a API roda **fora** do Docker. Todas as variáveis estão em [Variáveis de ambiente](#variáveis-de-ambiente).
 
-3. **Preparar o ambiente para contribuir** *(uma vez por clone)*:
+3. **Preparar o ambiente Python** *(uma vez por clone — necessário para testes, lint e rodar sem Docker)*:
+
+   Com `make` (qualquer sistema, no Windows pelo Git Bash):
 
    ```bash
-   git config commit.template .gitmessage   # template de mensagem de commit
-   python3.13 -m venv .venv                  # ambiente virtual do projeto
-   .venv/bin/pip install -r requirements-test.txt   # runtime + testes e qualidade (inclui pre-commit)
-   source .venv/bin/activate                 # ativa o venv neste terminal
-   pre-commit install                        # hooks: commitlint, nome da branch, ruff, mypy
+   make setup      # cria o .venv, instala requirements-test.txt, ativa os hooks e o template de commit
    ```
+
+   Sem `make`: crie o ambiente virtual, **ative** e instale as dependências. Ativar faz o terminal usar o Python e as libs do projeto (o prompt passa a mostrar `(.venv)`); repita a ativação em todo terminal novo.
+
+   ```bash
+   # Linux / macOS / WSL
+   python3.13 -m venv .venv
+   source .venv/bin/activate
+
+   # Windows — Git Bash
+   py -3.13 -m venv .venv
+   source .venv/Scripts/activate
+
+   # Windows — PowerShell
+   py -3.13 -m venv .venv
+   .venv\Scripts\Activate.ps1
+   ```
+
+   Depois, em qualquer sistema (com o venv ativado):
+
+   ```bash
+   pip install -r requirements-test.txt     # runtime + testes e qualidade (inclui pre-commit)
+   pre-commit install                       # hooks: commitlint, nome da branch, ruff, mypy
+   git config commit.template .gitmessage   # template de mensagem de commit
+   ```
+
+   Detalhes (cmd, sair do venv, política de execução do PowerShell): [docs/11 — Comandos](./docs/11-comandos.md#1-ambiente-virtual-venv).
 
 ## Rodando
 
@@ -95,9 +140,10 @@ docker compose up --build -d
 
 ```bash
 docker compose -f docker-compose.dev.yml up -d bot-varejo-dynamodb
-APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001 \
-  PYTHONPATH=. .venv/bin/uvicorn api.app_run:create_app --factory --reload --port 8000
+make run
 ```
+
+Sem `make`: coloque `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001` no `.env` e, com o venv ativado, rode `uvicorn api.app_run:create_app --factory --reload --port 8000`.
 
 ### Tabelas do banco
 
@@ -173,7 +219,12 @@ requirements-test.txt    # -r requirements.txt + testes e qualidade
 
 ## Testes e qualidade
 
-Com o venv ativado, na raiz do projeto (`export PYTHONPATH=.`):
+```bash
+make check      # lint + tipos + testes com cobertura (≥ 90%) + contrato OpenAPI
+make openapi    # atualiza o openapi.json depois de mudar o contrato
+```
+
+Sem `make`, com o venv ativado, na raiz do projeto:
 
 ```bash
 coverage run -m pytest && coverage report   # testes + cobertura (≥ 90%) + contrato OpenAPI
@@ -183,8 +234,6 @@ mypy api tests                              # tipos (--strict)
 lint-imports                                # fronteiras das camadas DDD
 python -m api.scripts.export_openapi openapi.json   # atualiza o contrato
 ```
-
-Com `make`: `make check` roda tudo o que o CI valida (`make help` lista os atalhos).
 
 Os testes de integração dos repositórios usam o DynamoDB Local: deixe `bot-varejo-dynamodb` no ar e rode com `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001`.
 
@@ -213,9 +262,11 @@ Os testes de integração dos repositórios usam o DynamoDB Local: deixe `bot-va
 | DynamoDB Local não sobe ou não grava | Volume corrompido ou de outra versão | `docker compose down -v` e subir de novo (apaga os dados locais) |
 | Front mostra erro de CORS no console | Origem do front fora de `APP_CORS_ORIGINS` | Ajustar `.env`: `APP_CORS_ORIGINS='["http://localhost:3000"]'` |
 | WebSocket fecha na hora (código 1008) | `Origin` ausente ou não permitido | Enviar `Origin` permitido (navegador envia sozinho) |
-| Teste de contrato falhando | `openapi.json` desatualizado | `python -m api.scripts.export_openapi openapi.json` (venv ativado, `PYTHONPATH=.`) e commitar |
-| Lib nova não aparece no dev (`ModuleNotFoundError`) | Deps instaladas no build da imagem | Subir com `--build`; fora do Docker, `.venv/bin/pip install -r requirements-test.txt` |
-| `ModuleNotFoundError: No module named 'api'` fora do Docker | Raiz do projeto fora do caminho de import | Rodar da raiz do projeto com `PYTHONPATH=.` (o `make` já define) |
+| Teste de contrato falhando | `openapi.json` desatualizado | `make openapi` (ou `python -m api.scripts.export_openapi openapi.json` com o venv ativado) e commitar |
+| Lib nova não aparece no dev (`ModuleNotFoundError`) | Deps instaladas no build da imagem | Subir com `--build`; fora do Docker, `pip install -r requirements-test.txt` com o venv ativado (ou `make install`) |
+| `ModuleNotFoundError` fora do Docker (`api`, `fastapi`…) | Comando rodado fora da raiz do projeto ou sem o venv ativado | Rodar da raiz do projeto com o venv ativado (ou usar o `make`) |
+| `make: command not found` | `make` não instalado ou fora do PATH | [Instalando o make](#instalando-o-make) — e abrir um terminal novo |
+| `pip`/`pytest` não encontrado ou usando libs do sistema | venv não ativado neste terminal | Ativar: `source .venv/bin/activate` (Linux/macOS) ou `source .venv/Scripts/activate` (Git Bash) |
 
 ## Contribuindo
 
@@ -223,12 +274,12 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Resumo:
 
 ```text
 branch:    feat/CPBS-123-descricao-curta                        ← sai da developer
-commit:    feat(backend): adiciona health check por escopo      ← escopos: backend | ci deps repo
+commit:    feat(backend): adiciona health check por escopo      ← escopos: backend | deps repo
            (linha em branco)
            Refs: CPBS-123
-MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · pipeline verde
+MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · `make check` verde
 publicar:  developer → staging → master   (MRs de promoção, template Release)
-tag:       backend-vX.Y.Z na master → deploy em production (aprovação manual)
+tag:       backend-vX.Y.Z na master (versão de production)
 ```
 
 - Template de commit: [`.gitmessage`](./.gitmessage) (ativado com `git config commit.template .gitmessage` — ver [Configuração](#configuração)).

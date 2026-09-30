@@ -45,7 +45,7 @@ flowchart LR
 | Uvicorn + FastAPI | REST (`/api/v1/*`), WebSocket (`/api/v1/ws/*`), OpenAPI/Swagger, CORS, validação de `Origin` |
 | Amazon DynamoDB | Persistência — uma tabela por bounded context ([12 — Persistência](./12-persistencia-dynamodb.md)) |
 
-**Um processo por container.** Detalhes em [08 — Docker e deploy](./08-docker-deploy.md).
+**Um processo por container.** Detalhes em [08 — Docker](./08-docker.md).
 
 ## 3. Rotas expostas
 

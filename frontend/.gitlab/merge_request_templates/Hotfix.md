@@ -36,11 +36,11 @@
 
 ## ↩️ Plano de rollback
 
-- Imagem atual em produção: `frontend:`
-- Rollback para: `frontend:`
+- Versão atual em produção: `frontend-v`
+- Rollback para: `frontend-v`
 - Passos:
 
-## 📈 Validação pós-deploy
+## 📈 Validação em produção
 
 - [ ] `GET /healthz` do front retornando 200
 - [ ] `/health` e `/admin/health` mostrando API `ok` (HTTP e WebSocket)
@@ -59,7 +59,7 @@
 - [ ] `make lint typecheck test` verde
 - [ ] Plano de rollback preenchido
 - [ ] Revisor(a) acionado(a) diretamente
-- [ ] Após o merge: tag `frontend-vX.Y.Z+1` na `master` e deploy de production aprovado
+- [ ] Após o merge: tag `frontend-vX.Y.Z+1` criada na `master`
 - [ ] Back-merge aberto no mesmo dia: MR `master → staging` e depois `staging → developer` (template Release) — links:
 
 /assign me

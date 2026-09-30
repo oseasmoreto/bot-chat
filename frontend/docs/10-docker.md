@@ -1,4 +1,4 @@
-# 10 — Docker e deploy (frontend)
+# 10 — Docker (frontend)
 
 Imagem própria do frontend, baseada em **`node:24-slim`**, rodando o **servidor padrão do Next.js** (`output: 'standalone'` → `node server.js`) — um processo por container ([ADR-0003](./adr/0003-imagem-node.md)). TLS e domínio (`app.<dominio>`) ficam na plataforma de deploy.
 
@@ -174,27 +174,9 @@ Documentadas também em `.env.example`.
 | `WS_URL` | `ws://localhost:8000` | ✅ (runtime) | Base WebSocket da API (`wss://` em produção) |
 | `PORT` | `3000` | — | Porta do servidor Next dentro do container |
 | `WEB_PORT` | `3000` | — | Porta publicada no host (compose) |
-| `E2E_BASE_URL` | `http://localhost:3000` | — | Front testado pelos E2E; no CI, variável do ambiente ([13](./13-ci.md)) |
+| `E2E_BASE_URL` | `http://localhost:3000` | — | Front testado pelos E2E; aponte para outro ambiente para testá-lo ([13](./13-comandos.md#3-e2e-contra-outro-ambiente)) |
 | `OPENAPI_URL` | `http://localhost:8000/api/openapi.json` | — | Origem do contrato para `pnpm openapi` (ferramenta de dev) |
 
 > O front falha ao renderizar se `API_URL`/`WS_URL` não estiverem definidas — erro explícito em vez de apontar silenciosamente para o lugar errado.
 
-## 5. Entrega por ambiente
-
-Cada branch permanente publica no seu ambiente ([CONTRIBUTING §1](../CONTRIBUTING.md#1-branches-e-fluxo-de-publicação)):
-
-```mermaid
-flowchart LR
-    mr["MR de trabalho<br/>merge na developer"] --> dev["developer<br/>imagem :developer<br/>deploy development"]
-    dev -->|"MR de promoção"| stg["staging<br/>imagem :staging<br/>deploy staging"]
-    stg -->|"MR de promoção"| mst["master<br/>imagem :master"]
-    mst -->|"tag frontend-vX.Y.Z"| prod["imagem :X.Y.Z<br/>deploy production<br/>(aprovação manual)"]
-```
-
-| Ambiente | Branch | Imagem | URL (convenção) | Deploy |
-|----------|--------|--------|-----------------|--------|
-| development | `developer` | `frontend:developer` | `https://app-dev.<dominio>` | automático |
-| staging | `staging` | `frontend:staging` | `https://app-staging.<dominio>` | automático |
-| production | `master` (tag) | `frontend:X.Y.Z` | `https://app.<dominio>` | manual (aprovação) |
-
-A mesma imagem roda em qualquer ambiente: o que muda são as **variáveis de ambiente** configuradas em cada um (§4). Detalhes do pipeline em [13 — CI](./13-ci.md).
+A mesma imagem roda em qualquer ambiente: o que muda são as **variáveis de ambiente** configuradas em cada um (§4).

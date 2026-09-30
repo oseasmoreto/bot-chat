@@ -22,7 +22,7 @@ CPBS-
 
 **Área / rota:** <!-- web /health · admin /admin/health -->
 **Navegador / dispositivo:** <!-- Chrome 1xx desktop, Safari iOS… -->
-**Ambiente / versão:** <!-- local / dev / staging / produção — imagem frontend:x.y.z -->
+**Ambiente / versão:** <!-- local / dev / staging / produção — versão frontend-vX.Y.Z -->
 
 ## 🔍 Causa raiz
 

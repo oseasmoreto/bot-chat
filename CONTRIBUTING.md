@@ -9,7 +9,7 @@ Este repositório contém **dois projetos independentes**. As regras completas e
 
 Este arquivo resume as regras e documenta o que é específico da raiz. **Ao mudar uma regra, atualize os três arquivos.**
 
-Plataforma: **GitLab** (merge requests, GitLab CI, Container Registry, Environments) · Tickets: **Jira** (`CPBS-xxx`).
+Plataforma: **GitLab** (repositório e merge requests) · Tickets: **Jira** (`CPBS-xxx`).
 
 ## 1. Branches e fluxo de publicação
 
@@ -33,7 +33,7 @@ flowchart LR
 
 | Origem | Destino | Tipo | Método | Template |
 |--------|---------|------|--------|----------|
-| `feat/*` `fix/*` `docs/*` `test/*` `refactor/*` `perf/*` `build/*` `ci/*` `chore/*` | `developer` | Trabalho | merge commit | Default / Bugfix / Docs |
+| `feat/*` `fix/*` `docs/*` `test/*` `refactor/*` `perf/*` `build/*` `chore/*` | `developer` | Trabalho | merge commit | Default / Bugfix / Docs |
 | `developer` | `staging` | Promoção | merge commit | Release |
 | `staging` | `master` | Promoção | merge commit | Release |
 | `hotfix/*` | `master` | Hotfix | merge commit | Hotfix |
@@ -57,7 +57,7 @@ Refs: CPBS-123
 |--------|---------|
 | `backend` | backend |
 | `frontend`, `web`, `admin` | frontend (`web`/`admin` = uma área; `frontend` = transversal) |
-| `ci`, `deps`, `repo` | qualquer projeto ou a raiz |
+| `deps`, `repo` | qualquer projeto ou a raiz |
 | `release` | somente títulos de MR de promoção/back-merge (`chore(release): promove developer para staging`) |
 
 Um commit — e um MR — **não mistura backend e frontend**.
@@ -74,41 +74,15 @@ Um commit — e um MR — **não mistura backend e frontend**.
 
 ## 4. Versionamento
 
-Tags anotadas **somente na `master`**, por projeto: `backend-vX.Y.Z` e `frontend-vX.Y.Z` (SemVer derivado dos commits). A tag publica a imagem versionada e libera o deploy de production com aprovação manual. `developer` e `staging` publicam as imagens `:developer` e `:staging`.
+Tags anotadas **somente na `master`**, por projeto: `backend-vX.Y.Z` e `frontend-vX.Y.Z` (SemVer derivado dos commits). `developer` e `staging` não recebem tags de versão.
 
 ## 5. Arquivos da raiz
 
 | Arquivo | Conteúdo |
 |---------|----------|
 | [`.gitmessage`](./.gitmessage) | Template de commit com a união dos escopos |
-| `commitlint.config.mjs` | Escopos: `backend`, `frontend`, `web`, `admin`, `ci`, `deps`, `repo`, `release` (demais regras iguais às dos projetos) |
-| `scripts/check-branch-name.sh`, `scripts/check-mr-flow.sh` | Iguais aos dos projetos (§5.2 e §5.3 dos guias) |
+| `commitlint.config.mjs` | Escopos: `backend`, `frontend`, `web`, `admin`, `deps`, `repo`, `release` (demais regras iguais às dos projetos) |
+| `scripts/check-branch-name.sh` | Igual ao dos projetos (§5.2 dos guias) |
 | `.pre-commit-config.yaml` | Commitlint + nome da branch + hooks de lint de cada projeto filtrados por pasta (`files: ^backend/`, `files: ^frontend/`) |
-| `.gitlab-ci.yml` | Valida o MR e inclui o pipeline de cada projeto |
 
-```yaml
-stages: [validate, test, build, e2e, publish, deploy]
-
-include:
-  - local: backend/.gitlab-ci.yml
-  - local: frontend/.gitlab-ci.yml
-
-repo:validate-mr:
-  stage: validate
-  image: node:24-slim
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  variables:
-    GIT_DEPTH: 0
-  before_script:
-    - apt-get update && apt-get install -y --no-install-recommends git
-    - npm install --no-save @commitlint/cli @commitlint/config-conventional
-  script:
-    - ./scripts/check-branch-name.sh "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
-    - ./scripts/check-mr-flow.sh
-    - title="${CI_MERGE_REQUEST_TITLE#Draft: }"
-    - echo "$title" | COMMITLINT_MR_TITLE=1 npx commitlint
-    - npx commitlint --from "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to "$CI_COMMIT_SHA"
-```
-
-Configurações do GitLab (branch padrão `developer`, branches e tags protegidas, merge commit sem squash, environments): §5.6 do guia de cada projeto.
+Configurações do GitLab (branch padrão `developer`, branches e tags protegidas, merge commit sem squash): §5.4 do guia de cada projeto.

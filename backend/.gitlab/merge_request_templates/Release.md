@@ -11,7 +11,7 @@
 
 ## 🚀 Tipo
 
-- [ ] Promoção `developer → staging` (deploy em **staging**)
+- [ ] Promoção `developer → staging` (homologação)
 - [ ] Promoção `staging → master` (produção após a tag)
 - [ ] Back-merge `master → staging` (pós-hotfix)
 - [ ] Back-merge `staging → developer` (pós-hotfix)
@@ -42,21 +42,21 @@
 
 **Antes do merge**
 
-- [ ] Pipeline da branch de origem verde
+- [ ] Validação completa da branch de origem verde (lint, tipos, testes)
 - [ ] Ambiente de origem saudável (`/api/v1/public/health`, `/api/v1/admin/health`, WebSocket)
 - [ ] (→ master) Homologação em **staging** concluída — responsável / evidência: <!-- link -->
 
 **Depois do merge**
 
-- [ ] Deploy concluído no ambiente de destino
+- [ ] Nova versão rodando no ambiente de destino
 - [ ] Health dos escopos `public` e `admin` = `ok`; WebSocket respondendo `health.pong`
-- [ ] (→ master) Tag `backend-vX.Y.Z` criada no commit de merge e deploy de **production** aprovado
+- [ ] (→ master) Tag `backend-vX.Y.Z` criada no commit de merge
 - [ ] (back-merge) Correção do hotfix presente na branch de destino
 
 ## ↩️ Rollback
 
-- Imagem atual no ambiente de destino: `backend:`
-- Rollback para: `backend:`
+- Versão atual no ambiente de destino: `backend-v`
+- Rollback para: `backend-v`
 
 ## 🔗 MRs relacionados
 

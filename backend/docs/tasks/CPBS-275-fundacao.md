@@ -34,7 +34,7 @@ Criar a **fundação da API**: estrutura, padrões, empacotamento Docker e um *h
 | 1 | Estrutura de pastas do projeto | [02 — Estrutura](../02-estrutura.md) |
 | 2 | Health check para os escopos `admin` e `public` | [06 — Contratos de API](../06-contratos-api.md) |
 | 3 | README com passo a passo para rodar localmente | [README do backend](../../README.md) |
-| 4 | Docker Compose subindo a API | [08 — Docker e deploy](../08-docker-deploy.md) |
+| 4 | Docker Compose subindo a API | [08 — Docker](../08-docker.md) |
 
 ## Definição de pronto (DoD)
 

@@ -36,11 +36,11 @@
 
 ## ↩️ Plano de rollback
 
-- Imagem atual em produção: `backend:`
-- Rollback para: `backend:`
+- Versão atual em produção: `backend-v`
+- Rollback para: `backend-v`
 - Passos:
 
-## 📈 Validação pós-deploy
+## 📈 Validação em produção
 
 - [ ] `GET /api/v1/public/health` e `GET /api/v1/admin/health` retornando `ok`
 - [ ] WebSocket respondendo `health.pong`
@@ -60,7 +60,7 @@
 - [ ] Contrato **não** quebrado (ou frontend avisado)
 - [ ] Plano de rollback preenchido
 - [ ] Revisor(a) acionado(a) diretamente
-- [ ] Após o merge: tag `backend-vX.Y.Z+1` na `master` e deploy de production aprovado
+- [ ] Após o merge: tag `backend-vX.Y.Z+1` criada na `master`
 - [ ] Back-merge aberto no mesmo dia: MR `master → staging` e depois `staging → developer` (template Release) — links:
 
 /assign me

@@ -104,7 +104,7 @@ Apresente e aguarde confirmação:
 - camelCase só no JSON via `BaseSchema`; Python em PEP 8.
 - Erros de negócio como `DomainError` com `code` estável; nada de `HTTPException` para regra de negócio.
 - Sem dependência nova sem necessidade; se precisar, `requirements*.txt` com `==` + `docs/13-dependencias.md`.
-- Não altere `config/`, `certificates/`, Dockerfile, compose ou CI sem o desenvolvedor pedir.
+- Não altere `config/`, `certificates/`, Dockerfile ou compose sem o desenvolvedor pedir.
 - Não faça commit, push nem tag.
 
 ## Fase 4 — Validação e resumo

@@ -15,7 +15,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    smoke["Smoke do container<br/>docker run + health (CI)"]
+    smoke["Smoke do container<br/>docker run + health"]
     contract["Contrato<br/>openapi.json versionado = gerado"]
     integ["Integração<br/>rotas HTTP (httpx) e WebSocket (TestClient)"]
     unit["Unitários<br/>domínio e casos de uso com fakes<br/>rápidos e numerosos"]
@@ -33,7 +33,7 @@ flowchart TB
 | **Mensagem WebSocket** | Integração: request → response, erros, `Origin` | Starlette `TestClient` (usa `httpx2`) | ✅ **todo `type`** |
 | CORS | Integração: origem permitida e negada | pytest + httpx | ✅ |
 | Contrato OpenAPI | `openapi.json` versionado = gerado | pytest | ✅ |
-| Imagem Docker | Smoke: container sobe e health responde 200 | CI (`docker run` + `curl`) | ✅ |
+| Imagem Docker | Smoke: container sobe e health responde 200 | `docker run` + `curl` | ✅ |
 
 > Os testes de tela e E2E do navegador pertencem ao frontend (`docs/11-testes.md` no repositório do **frontend**).
 
@@ -321,18 +321,19 @@ def test_committed_openapi_matches_backend(app: FastAPI) -> None:
     assert generated["components"] == committed["components"], "Rode `make openapi`"
 ```
 
-### Smoke da imagem (CI)
+### Smoke da imagem
 
 ```bash
-docker run -d --name bot-varejo-api-smoke -p 8000:8000 bot-varejo-api:ci
+docker build --target runtime -t bot-varejo-api:local .
+docker run -d --name bot-varejo-api-smoke -p 8000:8000 bot-varejo-api:local
 for i in $(seq 1 20); do curl -fsS http://localhost:8000/api/v1/public/health && break; sleep 1; done
 curl -fsS http://localhost:8000/api/v1/admin/health
 docker rm -f bot-varejo-api-smoke
 ```
 
-## 7. Onde cada teste roda
+## 7. Como rodar
 
-| Etapa | Comando | Local | CI |
-|-------|---------|-------|----|
-| Unit + integração + contrato | `make test` (`coverage run -m pytest` + `coverage report`) | ✅ | ✅ |
-| Smoke da imagem | job `backend:build` (sobe o container e chama os dois health) | — | ✅ |
+| Etapa | Comando |
+|-------|---------|
+| Unit + integração + contrato | `make test` (ou `coverage run -m pytest` + `coverage report` com o venv ativado — [11](./11-comandos.md)) |
+| Smoke da imagem | Comandos da §6 (*Smoke da imagem*) |

@@ -1,6 +1,6 @@
 # 02 — Estrutura de pastas (backend)
 
-O backend é um **projeto independente**: tem seu próprio README, docs, Dockerfile, docker compose, Makefile e pipeline. Nada aqui depende do código do frontend — a única ligação é o contrato HTTP/WS ([06](./06-contratos-api.md)).
+O backend é um **projeto independente**: tem seu próprio README, docs, Dockerfile, docker compose e Makefile. Nada aqui depende do código do frontend — a única ligação é o contrato HTTP/WS ([06](./06-contratos-api.md)).
 
 ```text
 backend/
@@ -13,7 +13,7 @@ backend/
 ├── requirements.txt             # dependências de runtime, versões fixadas (docs/13)
 ├── requirements-test.txt        # -r requirements.txt + testes e qualidade (docs/13)
 ├── pyproject.toml               # config de ruff, mypy, pytest, coverage, import-linter (sem dependências)
-├── openapi.json                 # contrato exportado (make openapi) — versionado, validado no CI
+├── openapi.json                 # contrato exportado (make openapi) — versionado, validado pelo teste de contrato
 ├── Dockerfile                   # multi-stage: dev, builder, runtime (python:3.13-slim)
 ├── docker-compose.yml           # bot-varejo-api (runtime) + bot-varejo-dynamodb
 ├── docker-compose.dev.yml       # bot-varejo-api (--reload) + bot-varejo-dynamodb
@@ -21,7 +21,6 @@ backend/
 ├── .env.example                 # todas as variáveis documentadas
 ├── .dockerignore
 ├── .gitignore                   # arquivos fora do git (.venv, caches, .env…)
-├── .gitlab-ci.yml               # pipeline: validate, lint, testes, build, publish
 ├── .gitlab/
 │   └── merge_request_templates/ # templates de MR do backend: Default, Bugfix, Docs, Hotfix, Release
 ├── .github/                     # GitHub Copilot (docs/14): instruções, prompts e agente
@@ -94,7 +93,7 @@ backend/
         └── test_openapi_schema.py   # openapi.json versionado = gerado
 ```
 
-> **Pacote `api` na raiz do projeto:** o código não é instalado com pip; ele entra no caminho de import por `PYTHONPATH` apontando para a raiz do projeto (Docker, Makefile) e por `pythonpath` do pytest. Os imports são absolutos a partir do pacote: `from api.core.scope import Scope`.
+> **Pacote `api` na raiz do projeto:** o código não é instalado com pip; os comandos rodam **na raiz do projeto**, que já está no caminho de import (no Docker, `PYTHONPATH=/app`). Os imports são absolutos a partir do pacote: `from api.core.scope import Scope`.
 
 ## O que vai em cada pasta
 
@@ -114,7 +113,7 @@ backend/
 | `config/` | Deploy/infra da plataforma | Arquivos exigidos pela plataforma de deploy | Código ou configuração lida pela aplicação (vai em `config.py` + variáveis `APP_*`) |
 | `certificates/` | Certificados de CA adicionais | `.crt` públicos | Chaves privadas, segredos |
 | `requirements*.txt` | Dependências ([13](./13-dependencias.md)) | Libs com versão fixada | — |
-| `.github/` | Configuração do GitHub Copilot ([14](./14-ia-copilot.md)) | Instruções, prompts e agentes | Workflows de CI (o CI é o `.gitlab-ci.yml`) |
+| `.github/` | Configuração do GitHub Copilot ([14](./14-ia-copilot.md)) | Instruções, prompts e agentes | Qualquer outra configuração |
 
 ### Onde colocar algo novo
 
@@ -125,7 +124,7 @@ backend/
 | Uma mensagem WebSocket nova | Handler em `presentation/ws_handlers.py` do context + `dispatcher.register(...)` no `container.py` |
 | Chamar a API de um parceiro | Port no `domain/ports.py` + adapter com httpx em `infrastructure/` |
 | Persistir dados | Port `…Repository` no `domain` + adapter DynamoDB em `infrastructure/` ([12](./12-persistencia-dynamodb.md)) |
-| Uma variável de ambiente | Campo no `Settings` (`api/config.py`) + `.env.example` + tabela em [08](./08-docker-deploy.md#4-variáveis-de-ambiente) |
+| Uma variável de ambiente | Campo no `Settings` (`api/config.py`) + `.env.example` + tabela em [08](./08-docker.md#4-variáveis-de-ambiente) |
 | Um erro de negócio | Subclasse de `DomainError` em `domain/errors.py` do context ([07](./07-erros-logging.md#exceções-de-negócio)) |
 | Uma lib nova | [13 — Dependências](./13-dependencias.md#4-adicionar-ou-atualizar-uma-dependência) |
 
@@ -141,5 +140,5 @@ backend/
 | Arquivo | Gerado por | Versionado? |
 |---------|-----------|-------------|
 | `openapi.json` | `make openapi` | ✅ (o diff mostra mudanças de contrato no MR) |
-| `.venv/` | `make install` (`python3.13 -m venv .venv` + `pip install -r requirements-test.txt`) | ❌ |
+| `.venv/` | `make install` (ou criar e ativar o venv e `pip install -r requirements-test.txt` — [11](./11-comandos.md)) | ❌ |
 | `.coverage`, `htmlcov/`, `coverage.xml` | coverage | ❌ |
