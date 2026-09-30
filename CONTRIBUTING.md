@@ -2,12 +2,12 @@
 
 Este repositório contém **dois projetos independentes**. As regras completas estão no guia de cada um:
 
-| Projeto | Guia completo | `.gitmessage` | Templates de MR |
-|---------|---------------|---------------|-----------------|
-| Backend (API REST + WebSocket) | [backend/CONTRIBUTING.md](./backend/CONTRIBUTING.md) | [backend/.gitmessage](./backend/.gitmessage) | [`backend/.gitlab/merge_request_templates/`](./backend/.gitlab/merge_request_templates) |
-| Frontend (Next.js — web + admin) | [frontend/CONTRIBUTING.md](./frontend/CONTRIBUTING.md) | [frontend/.gitmessage](./frontend/.gitmessage) | [`frontend/.gitlab/merge_request_templates/`](./frontend/.gitlab/merge_request_templates) |
+| Projeto | Guia completo | Templates de MR |
+|---------|---------------|-----------------|
+| Backend (API REST + WebSocket) | [backend/CONTRIBUTING.md](./backend/CONTRIBUTING.md) | [`backend/.gitlab/merge_request_templates/`](./backend/.gitlab/merge_request_templates) |
+| Frontend (Next.js — web + admin) | [frontend/CONTRIBUTING.md](./frontend/CONTRIBUTING.md) | [`frontend/.gitlab/merge_request_templates/`](./frontend/.gitlab/merge_request_templates) |
 
-Este arquivo resume as regras e documenta o que é específico da raiz. **Ao mudar uma regra, atualize os três arquivos.**
+Este arquivo resume as regras. **Ao mudar uma regra, atualize os três arquivos.**
 
 Plataforma: **GitLab** (repositório e merge requests) · Tickets: **Jira** (`CPBS-xxx`).
 
@@ -46,21 +46,14 @@ flowchart LR
 ## 2. Commits
 
 ```text
-<tipo>(<escopo>): <descrição em pt-BR, minúscula, sem ponto final>   ← máx. 72 caracteres
-
-[corpo: por que a mudança foi feita]
-
-Refs: CPBS-123
+<tipo>: [CPBS-123] <descrição em pt-BR, minúscula, sem ponto final>   ← máx. 72 caracteres
 ```
 
-| Escopo | Projeto |
-|--------|---------|
-| `backend` | backend |
-| `frontend`, `web`, `admin` | frontend (`web`/`admin` = uma área; `frontend` = transversal) |
-| `deps`, `repo` | qualquer projeto ou a raiz |
-| `release` | somente títulos de MR de promoção/back-merge (`chore(release): promove developer para staging`) |
+Exemplo: `feat: [CPBS-123] adiciona health check por escopo`.
 
-Um commit — e um MR — **não mistura backend e frontend**.
+- Tipos: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `style`, `build`, `chore`, `revert` (`!` depois do tipo quando quebra compatibilidade).
+- Ticket do Jira entre colchetes, obrigatório. Títulos de promoção/back-merge não têm ticket: `chore: promove developer para staging`.
+- Um commit — e um MR — **não mistura backend e frontend**.
 
 ## 3. Merge requests
 
@@ -75,14 +68,3 @@ Um commit — e um MR — **não mistura backend e frontend**.
 ## 4. Versionamento
 
 Tags anotadas **somente na `master`**, por projeto: `backend-vX.Y.Z` e `frontend-vX.Y.Z` (SemVer derivado dos commits). `developer` e `staging` não recebem tags de versão.
-
-## 5. Arquivos da raiz
-
-| Arquivo | Conteúdo |
-|---------|----------|
-| [`.gitmessage`](./.gitmessage) | Template de commit com a união dos escopos |
-| `commitlint.config.mjs` | Escopos: `backend`, `frontend`, `web`, `admin`, `deps`, `repo`, `release` (demais regras iguais às dos projetos) |
-| `scripts/check-branch-name.sh` | Igual ao dos projetos (§5.2 dos guias) |
-| `.pre-commit-config.yaml` | Commitlint + nome da branch + hooks de lint de cada projeto filtrados por pasta (`files: ^backend/`, `files: ^frontend/`) |
-
-Configurações do GitLab (branch padrão `developer`, branches e tags protegidas, merge commit sem squash): §5.4 do guia de cada projeto.

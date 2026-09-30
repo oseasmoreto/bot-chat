@@ -37,7 +37,6 @@ A orientação do projeto é **camelCase para métodos**. No backend aplicamos a
 | `mypy` | `strict = true` |
 | `import-linter` | fronteiras das camadas DDD ([03](./03-arquitetura-ddd.md)) |
 | EditorConfig | UTF-8, LF, indentação 4, newline final |
-| pre-commit | roda ruff e mypy nos arquivos alterados |
 
 
 ## Nomenclatura do código Python

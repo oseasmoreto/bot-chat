@@ -76,4 +76,3 @@ Python: ordenado pelo ruff (`I`) — stdlib, terceiros, `api`.
 | ESLint | typescript-eslint (strict), react-hooks, jsx-a11y, `@next/eslint-plugin-next`, **boundaries** ([04](./04-organizacao-areas-features.md#5-fronteiras-garantidas-por-lint)), ordem de imports |
 | TypeScript | `tsc --noEmit` com `strict` ([09](./09-estilo-e-typescript.md)) |
 | EditorConfig | UTF-8, LF, indentação 2, newline final |
-| pre-commit | roda prettier e eslint nos arquivos alterados de `frontend/` |

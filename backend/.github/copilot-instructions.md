@@ -94,4 +94,4 @@ Toda mudança de comportamento atualiza os docs no mesmo MR: endpoint/mensagem n
 
 ## Commits
 
-Conventional Commits em pt-BR, escopo `backend`, rodapé `Refs: CPBS-<n>` — ver [CONTRIBUTING.md](../CONTRIBUTING.md). Nunca faça commit, push ou tag sem o desenvolvedor pedir.
+Formato `tipo: [CPBS-<n>] descrição` em pt-BR (ex.: `feat: [CPBS-123] adiciona health check por escopo`) — ver [CONTRIBUTING.md](../CONTRIBUTING.md). Nunca faça commit, push ou tag sem o desenvolvedor pedir.

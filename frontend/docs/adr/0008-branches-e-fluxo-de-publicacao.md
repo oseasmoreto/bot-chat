@@ -12,7 +12,7 @@ O time precisa de ambientes separados de desenvolvimento, homologação e produ�
   - `staging` → **staging/homologação** (recebe só promoção da `developer`);
   - `master` → **production** (recebe só promoção da `staging` e `hotfix/*`).
 - Publicação: `developer → staging → master` por **MRs de promoção** (template *Release*).
-- **Todos os MRs** (trabalho, hotfix, promoção e back-merge) usam **merge commit**; squash fica **desabilitado** no projeto. Todo commit vai para o histórico, então todo commit segue o padrão (Conventional Commits + `Refs: CPBS-xxx`) e ajustes de revisão entram como novos commits.
+- **Todos os MRs** (trabalho, hotfix, promoção e back-merge) usam **merge commit**; squash fica **desabilitado** no projeto. Todo commit vai para o histórico, então todo commit segue o padrão (`tipo: [CPBS-xxx] descrição`) e ajustes de revisão entram como novos commits.
 - **Hotfix** sai da `master`, volta para a `master` e é obrigatoriamente levado de volta por **back-merge** `master → staging → developer`.
 - Tags de versão `frontend-vX.Y.Z` **somente na `master`**: a tag identifica a versão que vai para production.
 - A matriz origem → destino é garantida pelas permissões das branches protegidas e pela revisão; o squash fica desabilitado nas configurações do GitLab.

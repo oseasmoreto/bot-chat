@@ -1,6 +1,6 @@
 <!--
   FRONTEND — HOTFIX: correção urgente de problema em produção (branches hotfix/*).
-  Título do MR = cabeçalho no padrão de commit, ex.: fix(web): corrige tela em branco na página de status
+  Título do MR = mensagem no padrão de commit, ex.: fix: [CPBS-123] corrige tela em branco na página de status
   Branch criada a partir da master · destino: master · merge commit (sem squash).
   Depois do merge: tag de patch + back-merge master → staging → developer (template Release).
   Mudança MÍNIMA. Melhorias e refatorações vão em outro ticket.
@@ -63,4 +63,3 @@
 - [ ] Back-merge aberto no mesmo dia: MR `master → staging` e depois `staging → developer` (template Release) — links:
 
 /assign me
-/label ~hotfix ~bug ~frontend

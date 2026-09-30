@@ -6,7 +6,6 @@ O backend é um **projeto independente**: tem seu próprio README, docs, Dockerf
 backend/
 ├── README.md                    # passo a passo para rodar localmente
 ├── CONTRIBUTING.md              # branches, commits, MRs, versionamento, validações
-├── .gitmessage                  # template de mensagem de commit
 ├── docs/                        # esta documentação (+ adr/, tasks/)
 ├── config/                      # arquivos de deploy/infra da plataforma — não alterar a estrutura
 ├── certificates/                # certificados de CA adicionais (.crt)
@@ -17,7 +16,7 @@ backend/
 ├── Dockerfile                   # multi-stage: dev, builder, runtime (python:3.13-slim)
 ├── docker-compose.yml           # bot-varejo-api (runtime) + bot-varejo-dynamodb
 ├── docker-compose.dev.yml       # bot-varejo-api (--reload) + bot-varejo-dynamodb
-├── Makefile                     # make setup, up, dev, test, lint, openapi…
+├── Makefile                     # make install, up, dev, test, check, openapi…
 ├── .env.example                 # todas as variáveis documentadas
 ├── .dockerignore
 ├── .gitignore                   # arquivos fora do git (.venv, caches, .env…)

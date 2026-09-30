@@ -12,9 +12,9 @@ O backend precisa de um jeito único de declarar e instalar dependências, igual
   | Arquivo | Conteúdo | Onde é instalado |
   |---------|----------|------------------|
   | `requirements.txt` | Dependências de **runtime** | Imagem de produção e desenvolvimento |
-  | `requirements-test.txt` | `-r requirements.txt` + testes (pytest, pytest-asyncio, pytest-mock, freezegun, coverage, httpx2) e qualidade (ruff, mypy, import-linter, pre-commit) | Desenvolvimento — **nunca** na imagem de produção |
+  | `requirements-test.txt` | `-r requirements.txt` + testes (pytest, pytest-asyncio, pytest-mock, freezegun, coverage, httpx2) e qualidade (ruff, mypy, import-linter) | Desenvolvimento — **nunca** na imagem de produção |
 
-- **Toda versão fixada com `==`**, inclusive dependências transitivas que precisam de controle (ex.: `starlette`, `urllib3` por segurança). Atualização = MR `build(deps): …` com os testes verdes.
+- **Toda versão fixada com `==`**, inclusive dependências transitivas que precisam de controle (ex.: `starlette`, `urllib3` por segurança). Atualização = MR com commit `build: [CPBS-xxx] …` e os testes verdes.
 - Ambiente local em `.venv` (`python -m venv .venv`, ativado antes de usar `pip`); no Docker, venv só no estágio de runtime.
 - `pyproject.toml` guarda **apenas a configuração das ferramentas** (ruff, mypy, pytest, coverage, import-linter), sem dependências.
 - O pacote não é instalado: o código em `api/` entra no caminho de import rodando os comandos na raiz do projeto (e por `PYTHONPATH` no Docker).

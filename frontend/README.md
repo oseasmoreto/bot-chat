@@ -40,7 +40,6 @@ flowchart LR
 | Docker Engine + Docker Compose v2 | Compose ≥ 2.24 | Rodar o app (caminho recomendado) |
 | Node.js | 24 LTS (`.nvmrc`) | Rodar sem Docker, testes e lint |
 | pnpm | via `corepack enable` | Dependências |
-| pre-commit | 3+ | Hooks de commit (`pipx install pre-commit`) |
 
 > **Linux/WSL:** seu usuário precisa estar no grupo `docker` — `sudo usermod -aG docker $USER` e abra um novo terminal. Sem isso aparece `permission denied … docker.sock`.
 >
@@ -68,13 +67,11 @@ flowchart LR
 
    As URLs da API são lidas **em runtime**: a mesma imagem funciona em qualquer ambiente, basta mudar as variáveis.
 
-3. **Preparar o ambiente para contribuir** *(uma vez por clone)*:
+3. **Instalar as dependências** *(uma vez por clone)*:
 
    ```bash
-   git config commit.template .gitmessage   # template de mensagem de commit
    corepack enable && pnpm install          # dependências
    mkdir -p node_modules .next              # pastas de montagem do compose de dev, com o seu usuário
-   pre-commit install                       # hooks: commitlint, nome da branch, prettier, eslint
    ```
 
 ## Rodando
@@ -180,15 +177,12 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Resumo:
 
 ```text
 branch:    feat/CPBS-123-descricao-curta                        ← sai da developer
-commit:    feat(admin): adiciona tela de status      ← escopos: web admin frontend | deps repo
-           (linha em branco)
-           Refs: CPBS-123
+commit:    feat: [CPBS-123] adiciona tela de status      ← tipo: [ticket] descrição
 MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · lint, tipos e testes verdes
 publicar:  developer → staging → master   (MRs de promoção, template Release)
 tag:       frontend-vX.Y.Z na master (versão de production)
 ```
 
-- Template de commit: [`.gitmessage`](./.gitmessage) (ativado com `git config commit.template .gitmessage` — ver [Configuração](#configuração)).
 - Templates de MR: [`.gitlab/merge_request_templates/`](./.gitlab/merge_request_templates) — Default, Bugfix, Docs, Hotfix, Release.
 - Branches permanentes e protegidas: `developer` (development), `staging` (homologação), `master` (production) — fluxo e promoção em [CONTRIBUTING §1](./CONTRIBUTING.md#1-branches-e-fluxo-de-publicação).
-- Mudanças que envolvem o backend: ver [CONTRIBUTING §3.5](./CONTRIBUTING.md#35-mudanças-que-envolvem-o-backend).
+- Mudanças que envolvem o backend: ver [CONTRIBUTING §3.4](./CONTRIBUTING.md#34-mudanças-que-envolvem-o-backend).

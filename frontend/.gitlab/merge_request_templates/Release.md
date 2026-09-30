@@ -1,10 +1,10 @@
 <!--
   FRONTEND — RELEASE: promoção (developer → staging, staging → master) ou back-merge (master → staging, staging → developer).
   Título:
-    chore(release): promove developer para staging
-    chore(release): promove staging para master (frontend-vX.Y.Z)
-    chore(release): back-merge master para staging
-    chore(release): back-merge staging para developer
+    chore: promove developer para staging
+    chore: promove staging para master (frontend-vX.Y.Z)
+    chore: back-merge master para staging
+    chore: back-merge staging para developer
   ⚠️ NÃO apagar a branch de origem. Merge feito por Maintainer.
   Guia: CONTRIBUTING.md §1.6 e §1.7
 -->
@@ -66,10 +66,9 @@
 
 ## ✅ Checklist do release
 
-- [ ] Título no formato `chore(release): …`
+- [ ] Título no formato `chore: promove …` / `chore: back-merge …`
 - [ ] **"Delete source branch" desmarcado**
 - [ ] Origem → destino permitidos pela matriz (CONTRIBUTING §1.3)
 - [ ] Aprovações: ≥ 1 Maintainer (→ master: 2)
 
 /assign me
-/label ~release ~frontend

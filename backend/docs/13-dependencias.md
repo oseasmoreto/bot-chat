@@ -45,7 +45,6 @@ flowchart LR
 | `ruff` | 0.16.9 | Lint e formatação |
 | `mypy` | 2.3.1 | Checagem de tipos (`--strict`, plugin do Pydantic) |
 | `import-linter` | 2.15 | Fronteiras das camadas DDD (`lint-imports`) |
-| `pre-commit` | 4.6.2 | Hooks locais de commit (commitlint, ruff, mypy) |
 
 ## 3. Regras
 
@@ -72,6 +71,6 @@ flowchart LR
 
 4. Recriar o container de dev: `docker compose -f docker-compose.dev.yml up --build` (deps ficam na imagem).
 5. Atualizar a tabela deste documento.
-6. Commit `build(deps): adiciona <lib> para <motivo>` (escopo `deps` — [CONTRIBUTING §2.3](../CONTRIBUTING.md#23-escopos)).
+6. Commit `build: [CPBS-xxx] adiciona <lib> para <motivo>` ([CONTRIBUTING §2](../CONTRIBUTING.md#2-commits)).
 
 Para ver versões disponíveis: `pip index versions <lib>`. Para conferir conflitos antes de alterar: `pip install --dry-run -r requirements-test.txt`.

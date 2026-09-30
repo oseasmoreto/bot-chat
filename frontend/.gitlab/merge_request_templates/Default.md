@@ -1,6 +1,6 @@
 <!--
   FRONTEND — template padrão (feat, refactor, perf, test, build, chore).
-  Título do MR = cabeçalho no padrão de commit, ex.: feat(admin): adiciona tela de status
+  Título do MR = mensagem no padrão de commit, ex.: feat: [CPBS-123] adiciona tela de status
   Destino: developer · branch criada a partir da developer · merge commit (sem squash).
   Escopos: web · admin · frontend (shared, features comuns, config, Docker)
   Guia: CONTRIBUTING.md · Docs: docs/README.md
@@ -70,8 +70,8 @@ CPBS-
 ## ✅ Checklist do autor
 
 - [ ] Destino `developer`; commits organizados — todos no padrão, sem `wip` (sem squash, todos vão para o histórico)
-- [ ] Branch e commits no padrão (`tipo/CPBS-xxx-descricao`, `tipo(web|admin|frontend): ...` com `Refs: CPBS-xxx`)
-- [ ] Título do MR no formato `tipo(escopo): descrição`
+- [ ] Branch e commits no padrão (`tipo/CPBS-xxx-descricao`, `tipo: [CPBS-xxx] ...`)
+- [ ] Título do MR no formato `tipo: [CPBS-xxx] descrição`
 - [ ] Testes escritos **antes/junto** (TDD): toda feature, hook e tela nova/alterada tem teste; tela nova tem E2E
 - [ ] `make lint typecheck test` verde (eslint + fronteiras, prettier, tsc, vitest ≥ 80%)
 - [ ] Fronteiras respeitadas: web ↛ admin, admin ↛ web, feature ↛ feature, import de feature só pelo `index.ts`
@@ -82,4 +82,3 @@ CPBS-
 - [ ] Sem segredos, `console.log`, código comentado ou TODO sem ticket
 
 /assign me
-/label ~feature ~frontend

@@ -10,7 +10,7 @@ BIN    := $(VENV)/bin
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help setup install up down dev run test lint format typecheck check openapi build
+.PHONY: help install up down dev run test lint format typecheck check openapi build
 
 help: ## Lista os alvos
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -20,10 +20,6 @@ $(VENV)/pyvenv.cfg:
 
 install: $(VENV)/pyvenv.cfg ## Cria o .venv e instala as dependências (runtime + testes e qualidade)
 	$(BIN)/python -m pip install -r requirements-test.txt
-
-setup: install ## Prepara o clone: dependências, hooks e template de commit
-	$(BIN)/pre-commit install
-	git config commit.template .gitmessage
 
 up: ## Sobe a imagem de runtime + DynamoDB Local
 	docker compose up --build

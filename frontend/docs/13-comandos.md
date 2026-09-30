@@ -19,7 +19,7 @@ Tudo roda **na raiz do projeto**: scripts do `package.json` (`pnpm <script>`) ou
 
 | Alvo | O que faz |
 |------|-----------|
-| `make setup` | `pnpm install` + `pre-commit install` + `git config commit.template .gitmessage` |
+| `make install` | `corepack enable` + `pnpm install` |
 | `make up` | `docker compose up --build` (imagem de runtime) |
 | `make down` | `docker compose down` |
 | `make dev` | `docker compose -f docker-compose.dev.yml up --build` (hot reload) |

@@ -40,23 +40,53 @@ flowchart LR
 
 ### Instalando o make
 
-**Windows** — escolha **uma** das opções, depois **feche e abra de novo** o Git Bash (ou o PowerShell) e confira com `make --version`:
+O `make` é opcional (todo comando também está escrito por extenso), mas deixa o dia a dia mais simples: `make install`, `make dev`, `make check`…
 
-| Opção | Comando | Observação |
-|-------|---------|------------|
-| winget (já vem no Windows 10/11) | `winget install ezwinports.make` | Recomendada; não precisa de administrador |
-| Chocolatey | `choco install make` | Rodar o PowerShell **como administrador** |
+#### Windows — passo a passo
+
+1. **Abra o PowerShell** (menu Iniciar → digite "PowerShell"). Não precisa ser como administrador.
+2. **Instale o make pelo winget** (já vem no Windows 10/11):
+
+   ```powershell
+   winget install ezwinports.make
+   ```
+
+   Aceite os termos se ele perguntar (`Y`).
+3. **Feche todos os terminais** (PowerShell, Git Bash e o terminal do VS Code — se o VS Code estiver aberto, feche e abra de novo). O PATH novo só vale em terminais abertos depois da instalação.
+4. **Abra o Git Bash** na pasta do projeto e confira:
+
+   ```bash
+   make --version
+   # GNU Make 4.4.1 ...
+   ```
+
+5. **Teste no projeto:**
+
+   ```bash
+   make help       # lista os atalhos
+   make install    # cria o .venv e instala as dependências
+   ```
+
+Use o `make` sempre pelo **Git Bash**: o Makefile usa comandos de shell (`grep`, `awk`) que o Git Bash já traz. Ele detecta o Windows sozinho (usa `.venv/Scripts`) e chama `python`; se o seu `python` não for o 3.13, rode `make install PYTHON="py -3.13"`.
+
+**Sem winget?** Alternativas (escolha uma):
+
+| Gerenciador | Comando | Observação |
+|-------------|---------|------------|
+| Chocolatey | `choco install make` | PowerShell **como administrador** |
 | Scoop | `scoop install make` | Se você já usa o Scoop |
 
-Se o `make --version` ainda não for encontrado:
+**`make: command not found` depois de instalar?**
 
-1. Descubra onde ele foi instalado: no PowerShell, `Get-Command make` (ou procure `make.exe` em `%LOCALAPPDATA%\Microsoft\WinGet\Links`, `C:\ProgramData\chocolatey\bin` ou `~\scoop\shims`).
-2. Adicione essa pasta ao PATH: menu Iniciar → "Editar as variáveis de ambiente do sistema" → *Variáveis de Ambiente* → *Path* (do usuário) → *Novo*.
-3. Feche e abra o terminal de novo.
+1. Confirme que abriu um terminal **novo**.
+2. No PowerShell, rode `Get-Command make` para ver onde ele está. Se não aparecer, procure `make.exe` em `%LOCALAPPDATA%\Microsoft\WinGet\Links` (winget), `C:\ProgramData\chocolatey\bin` (Chocolatey) ou `~\scoop\shims` (Scoop).
+3. Adicione essa pasta ao PATH: menu Iniciar → "Editar as variáveis de ambiente para sua conta" → *Path* → *Editar* → *Novo* → cole a pasta → *OK*.
+4. Abra um terminal novo e rode `make --version` de novo.
 
-Use o `make` pelo **Git Bash**: o Makefile usa comandos de shell (`grep`, `awk`) que o Git Bash já traz. Ele detecta o Windows sozinho (usa `.venv/Scripts`) e chama `python`; se o seu `python` não for o 3.13, rode `make install PYTHON="py -3.13"`.
+#### Linux, WSL e macOS
 
-**Linux / WSL:** `sudo apt install make` · **macOS:** `xcode-select --install`.
+- **Ubuntu/Debian/WSL:** `sudo apt install make`
+- **macOS:** `xcode-select --install`
 
 ## Configuração
 
@@ -80,7 +110,7 @@ Use o `make` pelo **Git Bash**: o Makefile usa comandos de shell (`grep`, `awk`)
    Com `make` (qualquer sistema, no Windows pelo Git Bash):
 
    ```bash
-   make setup      # cria o .venv, instala requirements-test.txt, ativa os hooks e o template de commit
+   make install    # cria o .venv e instala requirements-test.txt
    ```
 
    Sem `make`: crie o ambiente virtual, **ative** e instale as dependências. Ativar faz o terminal usar o Python e as libs do projeto (o prompt passa a mostrar `(.venv)`); repita a ativação em todo terminal novo.
@@ -102,9 +132,7 @@ Use o `make` pelo **Git Bash**: o Makefile usa comandos de shell (`grep`, `awk`)
    Depois, em qualquer sistema (com o venv ativado):
 
    ```bash
-   pip install -r requirements-test.txt     # runtime + testes e qualidade (inclui pre-commit)
-   pre-commit install                       # hooks: commitlint, nome da branch, ruff, mypy
-   git config commit.template .gitmessage   # template de mensagem de commit
+   pip install -r requirements-test.txt     # runtime + testes e qualidade
    ```
 
    Detalhes (cmd, sair do venv, política de execução do PowerShell): [docs/11 — Comandos](./docs/11-comandos.md#1-ambiente-virtual-venv).
@@ -274,15 +302,12 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Resumo:
 
 ```text
 branch:    feat/CPBS-123-descricao-curta                        ← sai da developer
-commit:    feat(backend): adiciona health check por escopo      ← escopos: backend | deps repo
-           (linha em branco)
-           Refs: CPBS-123
+commit:    feat: [CPBS-123] adiciona health check por escopo    ← tipo: [ticket] descrição
 MR:        → developer · merge commit (sem squash) · template de .gitlab/ · ≥ 1 aprovação · `make check` verde
 publicar:  developer → staging → master   (MRs de promoção, template Release)
 tag:       backend-vX.Y.Z na master (versão de production)
 ```
 
-- Template de commit: [`.gitmessage`](./.gitmessage) (ativado com `git config commit.template .gitmessage` — ver [Configuração](#configuração)).
 - Templates de MR: [`.gitlab/merge_request_templates/`](./.gitlab/merge_request_templates) — Default, Bugfix, Docs, Hotfix, Release.
 - Branches permanentes e protegidas: `developer` (development), `staging` (homologação), `master` (production) — fluxo e promoção em [CONTRIBUTING §1](./CONTRIBUTING.md#1-branches-e-fluxo-de-publicação).
-- Mudanças que envolvem o frontend: ver [CONTRIBUTING §3.5](./CONTRIBUTING.md#35-mudanças-que-envolvem-o-frontend).
+- Mudanças que envolvem o frontend: ver [CONTRIBUTING §3.4](./CONTRIBUTING.md#34-mudanças-que-envolvem-o-frontend).

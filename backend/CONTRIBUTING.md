@@ -4,7 +4,7 @@
 
 Plataforma: **GitLab** (repositório e merge requests) · Tickets: **Jira** (`CPBS-xxx`).
 
-Resumo: **branch de trabalho** `tipo/CPBS-123-descricao` criada da `developer` → **commits** Conventional Commits com `Refs: CPBS-123` → **MR para `developer`** (merge commit) → **promoção** `developer → staging → master` (MRs de release, merge commit) → **tag** `backend-vX.Y.Z` na `master` → produção.
+Resumo: **branch de trabalho** `tipo/CPBS-123-descricao` criada da `developer` → **commits** `tipo: [CPBS-123] descrição` → **MR para `developer`** (merge commit) → **promoção** `developer → staging → master` (MRs de release, merge commit) → **tag** `backend-vX.Y.Z` na `master` → produção.
 
 ```mermaid
 flowchart LR
@@ -40,11 +40,11 @@ gitGraph
     branch staging
     branch developer
     branch feat/CPBS-123-health
-    commit id: "feat(backend): health"
+    commit id: "feat: health"
     checkout developer
     merge feat/CPBS-123-health id: "merge MR 1"
     branch fix/CPBS-301-ajuste
-    commit id: "fix(backend): cors"
+    commit id: "fix: cors"
     checkout developer
     merge fix/CPBS-301-ajuste id: "merge MR 2"
     checkout staging
@@ -63,7 +63,7 @@ gitGraph
 
 ### 1.3 Matriz origem → destino
 
-Qualquer combinação fora desta tabela é **proibida**: as branches protegidas limitam quem faz merge em cada destino (§5.4) e quem revisa confere origem e destino (§3.4).
+Qualquer combinação fora desta tabela é **proibida** — quem revisa confere origem e destino (§3.3).
 
 | Origem | Destino | Tipo de MR | Método | Template |
 |--------|---------|------------|--------|----------|
@@ -74,7 +74,7 @@ Qualquer combinação fora desta tabela é **proibida**: as branches protegidas 
 | `master` | `staging` | Back-merge (pós-hotfix) | merge commit | Release |
 | `staging` | `developer` | Back-merge (pós-hotfix) | merge commit | Release |
 
-**Não usamos squash** em nenhum MR: todos são integrados com **merge commit**. Assim cada commit da branch de trabalho — com seu `Refs: CPBS-xxx` — é preservado, e as três branches compartilham **exatamente os mesmos commits**: o que está em produção é, commit a commit, o que foi validado em staging.
+**Não usamos squash** em nenhum MR: todos são integrados com **merge commit**. Assim cada commit da branch de trabalho — com seu `[CPBS-xxx]` — é preservado, e as três branches compartilham **exatamente os mesmos commits**: o que está em produção é, commit a commit, o que foi validado em staging.
 
 ### 1.4 Nome das branches de trabalho
 
@@ -89,7 +89,7 @@ Qualquer combinação fora desta tabela é **proibida**: as branches protegidas 
 | `descricao-curta` | 2 a 5 palavras, kebab-case, minúsculas, sem acentos | `health-check` |
 | Tamanho total | Máximo 60 caracteres | — |
 
-Regex validada no hook local `pre-push` (as permanentes `developer`, `staging` e `master` são aceitas à parte):
+Regex de referência (as permanentes `developer`, `staging` e `master` são aceitas à parte):
 
 ```text
 ^(feat|fix|hotfix|docs|test|refactor|perf|build|chore)/CPBS-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$
@@ -116,7 +116,7 @@ Regex validada no hook local `pre-push` (as permanentes `developer`, `staging` e
 2. **Uma branch = um ticket.** Ticket grande? Quebre em sub-tickets e MRs menores.
 3. **Vida curta:** ideal até 3 dias. Branch parada fica desatualizada e gera conflito.
 4. **Atualizar com rebase** na branch de origem: `git fetch && git rebase origin/developer` (hotfix: `origin/master`). Depois: `git push --force-with-lease` (nunca `--force` puro; nunca em branch permanente).
-5. **Apagar após o merge** (opção "Delete source branch" marcada por padrão no GitLab). Branches permanentes nunca são apagadas — o GitLab não remove branches protegidas.
+5. **Apagar após o merge** (marque "Delete source branch" no MR). Branches permanentes nunca são apagadas.
 
 ### 1.6 Promoção (release)
 
@@ -125,16 +125,16 @@ Feita por um **Maintainer** (responsável pelo release).
 **`developer → staging`**
 
 1. Conferir que a validação completa da `developer` está verde (§3.1) e que o ambiente **development** está saudável.
-2. Abrir MR `developer → staging` com o template **Release**, título `chore(release): promove developer para staging`.
+2. Abrir MR `developer → staging` com o template **Release**, título `chore: promove developer para staging`.
 3. Listar os MRs/tickets incluídos: `git log --oneline --no-merges origin/staging..origin/developer`.
-4. Confirmar dependências entre projetos (§3.5) e variáveis de ambiente novas já configuradas em **staging**.
+4. Confirmar dependências entre projetos (§3.4) e variáveis de ambiente novas já configuradas em **staging**.
 5. Merge **sem apagar a branch de origem**; o ambiente **staging** passa a rodar esta versão.
 6. Validação/QA em staging. Bug encontrado → `fix/*` a partir da `developer` → nova promoção.
 
 **`staging → master`**
 
 1. Validação em staging concluída e registrada no MR.
-2. Abrir MR `staging → master` com o template **Release**, título `chore(release): promove staging para master (backend-vX.Y.Z)`.
+2. Abrir MR `staging → master` com o template **Release**, título `chore: promove staging para master (backend-vX.Y.Z)`.
 3. Calcular a versão (§4) e conferir variáveis de ambiente de **production**.
 4. Merge → criar a tag **`backend-vX.Y.Z`** no commit de merge da `master`: é a versão que vai para **production**.
 5. Validação em **production** (health, telas/fluxos críticos) e comunicação do release.
@@ -153,7 +153,7 @@ gitGraph
     commit id: "features em andamento"
     checkout master
     branch hotfix/CPBS-290-correcao
-    commit id: "fix(backend): timeout ws"
+    commit id: "fix: timeout ws"
     checkout master
     merge hotfix/CPBS-290-correcao id: "merge hotfix" tag: "backend-v0.2.1"
     checkout staging
@@ -165,34 +165,24 @@ gitGraph
 1. Ticket de prioridade alta; branch `hotfix/CPBS-xxx-descricao` **a partir da `master`**.
 2. Correção **mínima** + teste de regressão; MR `hotfix/* → master` com o template **Hotfix**.
 3. Merge → tag de patch `backend-vX.Y.Z+1`, a versão que vai para **production**.
-4. **Back-merge obrigatório** no mesmo dia: MR `master → staging` e depois `staging → developer` (template **Release**, merge commit, título `chore(release): back-merge master para staging` / `… staging para developer`). Sem isso a correção some na próxima promoção.
+4. **Back-merge obrigatório** no mesmo dia: MR `master → staging` e depois `staging → developer` (template **Release**, merge commit, título `chore: back-merge master para staging` / `… staging para developer`). Sem isso a correção some na próxima promoção.
 
-## 2. Commits — Conventional Commits
+## 2. Commits
 
 ### 2.1 Formato
 
 ```text
-<tipo>(<escopo>): <descrição>
-                                        ← linha em branco
-[corpo opcional: POR QUE a mudança foi feita]
-                                        ← linha em branco
-Refs: CPBS-123
-[BREAKING CHANGE: descrição, se houver]
+<tipo>: [CPBS-123] <descrição>
 ```
 
 | Parte | Regra |
 |-------|-------|
 | `tipo` | Obrigatório — tabela §2.2 |
-| `escopo` | Esperado (aviso se ausente) — tabela §2.3 |
+| `[CPBS-123]` | **Obrigatório** — chave do ticket no Jira, entre colchetes, em maiúsculas |
 | `descrição` | Obrigatória; **pt-BR**, verbo no presente (completa a frase "este commit…": *adiciona*, *corrige*, *remove*); começa com **minúscula**; **sem ponto final** |
-| Cabeçalho | Máximo **72 caracteres** |
-| Corpo | Opcional; explica o **porquê** e o contexto, não o "o quê" (o diff já mostra); linhas até 100 caracteres |
-| `Refs: CPBS-123` | **Obrigatório** em todo commit de trabalho — liga o commit ao ticket |
-| `BREAKING CHANGE:` | Obrigatório quando quebra contrato ou comportamento esperado por quem consome. Também marcar `!` no cabeçalho |
-
-Template de mensagem: [`.gitmessage`](./.gitmessage) — ativado por `make setup` (venv + dependências + `pre-commit install` + `git config commit.template .gitmessage`).
-
-Os commits de merge gerados pelo GitLab em todos os MRs (`Merge branch 'feat/…' into 'developer'`) são aceitos automaticamente pelo commitlint.
+| Tamanho | Primeira linha com no máximo **72 caracteres** |
+| Corpo | Opcional, depois de uma linha em branco: explica o **porquê** (o diff já mostra o quê) |
+| Quebra de compatibilidade | `!` depois do tipo (`feat!: …`) e o impacto explicado no corpo |
 
 ### 2.2 Tipos
 
@@ -205,76 +195,56 @@ Os commits de merge gerados pelo GitLab em todos os MRs (`Merge branch 'feat/…
 | `test` | Adiciona/ajusta testes, sem mudar produção | — |
 | `docs` | Somente documentação | — |
 | `style` | Formatação pura (sem mudança de lógica) | — |
-| `build` | Dockerfile, dependências, build | — |
-| `chore` | Manutenção; `chore(release)` nos títulos de promoção/back-merge | — |
+| `build` | Dockerfile, dependências (`requirements.txt` / `requirements-test.txt`), build | — |
+| `chore` | Manutenção; também nos títulos de promoção/back-merge | — |
 | `revert` | Reverte um commit anterior | — |
 
-Qualquer tipo com `!` ou rodapé `BREAKING CHANGE:` gera versão **major** (em `0.x`, **minor**).
+Qualquer tipo com `!` gera versão **major** (em `0.x`, **minor**).
 
-### 2.3 Escopos
-
-| Escopo | Quando usar |
-|--------|-------------|
-| `backend` | Qualquer mudança de código, testes, docs, Docker ou config do backend |
-| `deps` | Atualização de dependências (`requirements.txt` / `requirements-test.txt`) |
-| `repo` | Arquivos de repositório: `README.md`, `CONTRIBUTING.md`, `.gitmessage`, templates, hooks |
-| `release` | **Somente** título de MR de promoção e de back-merge (§1.6 e §1.7) |
-
-### 2.4 Exemplos
+### 2.3 Exemplos
 
 ✅ Bons:
 
 ```text
-feat(backend): adiciona health check por escopo
+feat: [CPBS-123] adiciona health check por escopo
+```
+
+```text
+feat: [CPBS-123] adiciona health check por escopo
 
 Expõe GET /api/v1/{public,admin}/health usando o mesmo caso de uso,
 para que o frontend valide a comunicação ponta a ponta.
-
-Refs: CPBS-123
 ```
 
 ```text
-fix(backend): fecha websocket com código 1008 para origem não permitida
-
-Refs: CPBS-301
+fix: [CPBS-301] fecha websocket com código 1008 para origem não permitida
+test: [CPBS-123] cobre rejeição de origem no handshake websocket
+feat!: [CPBS-340] renomeia campo uptime para uptimeSeconds no health
 ```
 
-```text
-feat(backend)!: renomeia campo uptime para uptimeSeconds no health
-
-BREAKING CHANGE: consumidores do health devem ler `uptimeSeconds`.
-Refs: CPBS-340
-```
+✅ Título de MR de promoção/back-merge (sem ticket):
 
 ```text
-test(backend): cobre rejeição de origem no handshake websocket
-
-Refs: CPBS-123
-```
-
-✅ Título de MR de promoção (não precisa de `Refs`):
-
-```text
-chore(release): promove developer para staging
-chore(release): promove staging para master (backend-v0.2.0)
+chore: promove developer para staging
+chore: promove staging para master (backend-v0.2.0)
 ```
 
 ❌ Ruins:
 
 | Mensagem | Problema |
 |----------|----------|
-| `ajustes` | Sem tipo, sem escopo, sem ticket, não diz nada |
-| `feat: Adicionado health.` | Maiúscula, particípio, ponto final, sem escopo e sem `Refs` |
-| `feat(frontend): ...` neste repositório | Escopo de outro projeto — mudanças do front vão no repositório do frontend |
-| `feat(release): ...` em MR de trabalho | `release` é exclusivo de promoção/back-merge |
+| `ajustes` | Sem tipo, sem ticket, não diz nada |
+| `feat: adiciona health` | Sem o ticket `[CPBS-…]` |
+| `feat: [cpbs-123] Adicionado health.` | Ticket minúsculo, maiúscula, particípio, ponto final |
+| `feat(backend): [CPBS-123] …` | Sem escopo entre parênteses: o formato é `tipo: [ticket] descrição` |
 | `wip`, `ajuste`, `fix review` | Sem squash, todo commit vai para o histórico: reescreva commits temporários antes de abrir o MR (`git rebase -i origin/developer`) |
 
-### 2.5 Boas práticas
+### 2.4 Boas práticas
 
 - **Um commit = uma mudança lógica.** Facilita revisão e `git revert`.
 - **Sem squash, o histórico é o que você commitar:** todos os commits da branch vão para `developer`, `staging` e `master`. Antes de abrir o MR, revise-os (`git log origin/developer..HEAD`) e reescreva mensagens fora do padrão ou commits temporários com `git rebase -i origin/developer`.
-- **Durante a revisão:** ajustes pedidos entram como **novos commits** no padrão (ex.: `fix(backend): trata origem ausente no handshake`), sem reescrever o que já foi revisado.
-- **TDD no histórico:** é bem-vindo o par `test(...)` → `feat(...)`, mostrando o teste antes da implementação.
+- **Durante a revisão:** ajustes pedidos entram como **novos commits** no padrão (ex.: `fix: [CPBS-123] trata origem ausente no handshake`), sem reescrever o que já foi revisado.
+- **TDD no histórico:** é bem-vindo o par `test: …` → `feat: …`, mostrando o teste antes da implementação.
 - **Nada quebrado:** cada commit deveria passar em lint e testes.
 - **Sem arquivos gerados** fora os previstos (`openapi.json`) e **sem segredos** — nunca.
 
@@ -284,7 +254,7 @@ chore(release): promove staging para master (backend-v0.2.0)
 
 | Regra | MR de trabalho (→ `developer`) | MR de promoção / back-merge | MR de hotfix (→ `master`) |
 |-------|-------------------------------|-----------------------------|---------------------------|
-| **Título** | Cabeçalho de commit: `feat(backend): adiciona health check por escopo` | `chore(release): promove <origem> para <destino>` | Cabeçalho de commit: `fix(...)` |
+| **Título** | Formato de commit: `feat: [CPBS-123] adiciona health check por escopo` | `chore: promove <origem> para <destino>` | Formato de commit: `fix: [CPBS-…] …` |
 | Template | Default / Bugfix / Docs | **Release** | **Hotfix** |
 | Apagar branch de origem | Sim | **Não** (branch permanente) | Sim |
 | Aprovações | ≥ 1 (não o autor) | ≥ 1 **Maintainer**; para `master`: **2** | **2**, incluindo 1 Maintainer |
@@ -295,7 +265,7 @@ Regras comuns a todos:
 | Regra | Valor |
 |-------|-------|
 | Método de merge | **Merge commit** em todos os MRs — squash **desabilitado** no projeto |
-| Commits | Todos no padrão da §2 (validados pelo commitlint no hook `commit-msg`); nada de `wip` |
+| Commits | Todos no padrão da §2; nada de `wip` |
 | Em andamento | Prefixo `Draft:` no título — não pode ser mergeado |
 | Preenchimento | **Todas** as seções do template; o que não se aplica recebe "N/A" com motivo |
 | Tamanho (trabalho) | Ideal **até ~400 linhas** alteradas (sem contar arquivos gerados). Maior que isso: quebrar |
@@ -325,24 +295,9 @@ Em [`.gitlab/merge_request_templates/`](./.gitlab/merge_request_templates) — a
 | Validação de hotfix | Health dos escopos `public`/`admin` + WebSocket |
 | Release | MRs/tickets incluídos, contrato compatível com o frontend do ambiente de destino, variáveis configuradas, rollback |
 
-Todos terminam com *quick actions* (`/assign me`, `/label ~tipo ~backend`) aplicadas ao criar o MR.
+Todos terminam com a *quick action* `/assign me`, aplicada ao criar o MR.
 
-### 3.3 Labels
-
-Criar no projeto do GitLab (Manage → Labels):
-
-| Label | Cor sugerida | Aplicada por |
-|-------|--------------|--------------|
-| `feature` | azul | template Default |
-| `bug` | vermelho | template Bugfix |
-| `hotfix` | vermelho escuro | template Hotfix |
-| `documentation` | cinza | template Docs |
-| `release` | dourado | template Release |
-| `backend` | verde | todos os templates deste projeto |
-| `contract-change` | roxo | autor, quando o MR muda/consome contrato novo da API |
-| `breaking-change` | laranja | autor, quando houver `BREAKING CHANGE` |
-
-### 3.4 Checklist de revisão (para quem revisa)
+### 3.3 Checklist de revisão (para quem revisa)
 
 - [ ] O título e os commits seguem o padrão; o ticket faz sentido com a mudança.
 - [ ] Origem e destino respeitam a matriz da §1.3.
@@ -357,7 +312,7 @@ Criar no projeto do GitLab (Manage → Labels):
 
 Comentários de revisão: prefixar com **`bloqueante:`**, **`sugestão:`** ou **`dúvida:`** para deixar claro o que impede o merge.
 
-### 3.5 Mudanças que envolvem o Frontend
+### 3.4 Mudanças que envolvem o Frontend
 
 Mudanças de contrato consumidas pelo **frontend** seguem esta ordem **em cada ambiente**, porque os dois projetos são implantados separadamente:
 
@@ -379,156 +334,24 @@ flowchart LR
 - A versão é derivada dos commits desde a última tag (tabela §2.2): `feat` → minor, `fix`/`perf` → patch, breaking → major. Em `0.x`, breaking sobe o **minor**. Hotfix → patch.
 - Criada pelo Maintainer responsável pelo release, **depois** do merge na `master`: tag anotada no commit de merge, enviada com `git push origin <tag>`.
 - `developer` e `staging` **não recebem tags de versão**.
-- Futuro (opcional): `CHANGELOG.md` gerado a partir dos Conventional Commits.
+- Futuro (opcional): `CHANGELOG.md` gerado a partir dos tipos e tickets dos commits.
 
-## 5. Como o padrão é garantido
-
-Duas camadas — hooks locais (feedback rápido) e configuração do GitLab (bloqueio).
-
-```mermaid
-flowchart LR
-    subgraph local["Na máquina (pre-commit)"]
-        h1["commit-msg<br/>commitlint"]
-        h2["pre-push<br/>check-branch-name.sh"]
-        h3["pre-commit<br/>lint/format"]
-    end
-    subgraph gl["Configuração do GitLab"]
-        g1["developer, staging, master<br/>protegidas"]
-        g2["merge commit<br/>(squash desabilitado)"]
-        g3["threads resolvidas e<br/>aprovações"]
-    end
-    local --> gl
-```
-
-Os arquivos abaixo ficam **na raiz do repositório**.
-
-### 5.1 `commitlint.config.mjs`
-
-O commitlint roda pelo `pre-commit` (que instala o Node e as dependências sozinho) no hook `commit-msg`.
-
-```js
-const TYPES = ['feat', 'fix', 'perf', 'refactor', 'test', 'docs', 'style', 'build', 'chore', 'revert'];
-const SCOPES = ['backend', 'deps', 'repo', 'release'];
-
-
-export default {
-  extends: ['@commitlint/config-conventional'],
-  parserPreset: { parserOpts: { issuePrefixes: ['CPBS-'] } },
-  rules: {
-    'type-enum': [2, 'always', TYPES],
-    'scope-enum': [2, 'always', SCOPES],
-    'scope-empty': [1, 'never'],
-    'header-max-length': [2, 'always', 72],
-    'body-max-line-length': [2, 'always', 100],
-    'references-empty': [2, 'never'],
-  },
-};
-```
-
-### 5.2 `scripts/check-branch-name.sh`
-
-```bash
-#!/usr/bin/env bash
-# Valida o nome da branch. Uso: check-branch-name.sh [nome]  (padrão: branch atual)
-set -euo pipefail
-
-branch="${1:-$(git rev-parse --abbrev-ref HEAD)}"
-pattern='^(feat|fix|hotfix|docs|test|refactor|perf|build|chore)/CPBS-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$'
-max_length=60
-
-case "$branch" in
-  developer|staging|master) exit 0 ;;   # branches permanentes
-esac
-
-if [[ "$branch" =~ $pattern ]] && (( ${#branch} <= max_length )); then
-  exit 0
-fi
-
-echo "✖ Nome de branch inválido: '$branch'" >&2
-echo "  Esperado: <tipo>/CPBS-<numero>-<descricao-em-kebab-case> (máx. $max_length caracteres)" >&2
-echo "  Exemplo:  feat/CPBS-123-health-check" >&2
-echo "  Ver: CONTRIBUTING.md §1.4" >&2
-exit 1
-```
-
-### 5.3 `.pre-commit-config.yaml`
-
-```yaml
-default_install_hook_types: [pre-commit, commit-msg, pre-push]
-
-repos:
-  # Mensagem de commit
-  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v9.x.x   # fixar a versão na implementação
-    hooks:
-      - id: commitlint
-        stages: [commit-msg]
-        additional_dependencies: ['@commitlint/config-conventional']
-
-  - repo: local
-    hooks:
-      # Nome da branch
-      - id: branch-name
-        name: nome da branch
-        entry: scripts/check-branch-name.sh
-        language: script
-        pass_filenames: false
-        always_run: true
-        stages: [pre-push]
-
-      # Qualidade do backend — usa o ruff/mypy do .venv: faça o commit com o venv ativado
-      - id: ruff
-        name: ruff (lint)
-        entry: ruff check --fix
-        language: system
-        types: [python]
-      - id: ruff-format
-        name: ruff (format)
-        entry: ruff format
-        language: system
-        types: [python]
-      - id: mypy
-        name: mypy --strict
-        entry: mypy api tests
-        language: system
-        types: [python]
-        pass_filenames: false
-```
-
-### 5.4 Configurações do projeto no GitLab
-
-| Onde (GitLab) | Configuração |
-|---------------|--------------|
-| Settings → Repository → Branch defaults | **Default branch: `developer`** |
-| Settings → Repository → Protected branches | `developer`: *Allowed to merge* = Developers + Maintainers · `staging`: Maintainers · `master`: Maintainers. Nas três: *Allowed to push and merge* = **No one**; *Allowed to force push* = **desligado** |
-| Settings → Repository → Protected tags | `backend-v*`: só Maintainers criam |
-| Settings → Merge requests → Merge method | **Merge commit** (todos os MRs; preserva cada commit e o mesmo histórico entre ambientes) |
-| Settings → Merge requests → Squash commits when merging | **Do not allow** (squash desabilitado) |
-| Settings → Merge requests → Merge commit message template | Padrão do GitLab (`Merge branch '%{source_branch}' into '%{target_branch}'` + título + referência do MR). Começa com `Merge`, então o commitlint o ignora |
-| Settings → Merge requests → Merge checks | ✅ *All threads must be resolved* |
-| Settings → Merge requests → Merge options | ✅ *Delete source branch by default* (branches protegidas nunca são apagadas) |
-| Settings → Merge requests → Approvals | Regras da §3.1; autor não pode aprovar o próprio MR |
-| Settings → Repository → Push rules *(se o plano tiver)* | Branch name regex = a do §1.4 (+ permanentes) |
-| Settings → Integrations → Jira *(se usado)* | Ativar para que `CPBS-xxx` em branch, commit e MR crie o link no ticket |
-
-> **Plano do GitLab:** aprovações **obrigatórias**, regras de aprovação por branch de destino/caminho e *Push rules* são recursos pagos (Premium/Ultimate). No plano Free, essas regras valem **por convenção** (checklist de revisão), com a garantia técnica nas branches protegidas, nas tags protegidas e nos hooks locais.
-
-## 6. Cola rápida
+## 5. Cola rápida
 
 ```bash
 # começar uma tarefa
 git switch developer && git pull
 git switch -c feat/CPBS-123-minha-feature
 
-# commitar (abre o editor com o template .gitmessage)
+# commitar
 git add -p
-git commit
+git commit -m "feat: [CPBS-123] adiciona health check por escopo"
 
 # atualizar com a developer
 git fetch && git rebase origin/developer
 git push --force-with-lease
 
-# abrir o MR → developer: título "feat(backend): adiciona ..." + template Default
+# abrir o MR → developer: título no formato do commit + template Default
 
 # hotfix
 git switch master && git pull

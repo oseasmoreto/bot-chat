@@ -1,6 +1,6 @@
 <!--
   FRONTEND — correção de bug (branches fix/*).
-  Título do MR = cabeçalho no padrão de commit, ex.: fix(admin): corrige status do websocket após reconexão
+  Título do MR = mensagem no padrão de commit, ex.: fix: [CPBS-123] corrige status do websocket após reconexão
   Destino: developer · branch criada a partir da developer · merge commit (sem squash).
   Urgente em produção? Use o template Hotfix.
 -->
@@ -49,11 +49,10 @@ CPBS-
 ## ✅ Checklist do autor
 
 - [ ] Destino `developer` (bug em produção urgente? use Hotfix); commits organizados, sem `wip`
-- [ ] Branch e commits no padrão (`fix/CPBS-xxx-descricao`, `fix(web|admin|frontend): ...` com `Refs: CPBS-xxx`)
+- [ ] Branch e commits no padrão (`fix/CPBS-xxx-descricao`, `fix: [CPBS-xxx] ...`)
 - [ ] Teste de regressão adicionado e falhando sem a correção
 - [ ] `make lint typecheck test` verde
 - [ ] Documentação atualizada, se o comportamento documentado mudou
 - [ ] Sem segredos, `console.log` ou código comentado
 
 /assign me
-/label ~bug ~frontend

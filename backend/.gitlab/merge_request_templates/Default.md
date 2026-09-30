@@ -1,6 +1,6 @@
 <!--
   BACKEND — template padrão (feat, refactor, perf, test, build, chore).
-  Título do MR = cabeçalho no padrão de commit, ex.: feat(backend): adiciona health check por escopo
+  Título do MR = mensagem no padrão de commit, ex.: feat: [CPBS-123] adiciona health check por escopo
   Destino: developer · branch criada a partir da developer · merge commit (sem squash).
   Guia: CONTRIBUTING.md · Docs: docs/README.md
   Preencha todas as seções. O que não se aplicar: "N/A" + motivo.
@@ -68,8 +68,8 @@ CPBS-
 ## ✅ Checklist do autor
 
 - [ ] Destino `developer`; commits organizados — todos no padrão, sem `wip` (sem squash, todos vão para o histórico)
-- [ ] Branch e commits no padrão (`tipo/CPBS-xxx-descricao`, `tipo(backend): ...` com `Refs: CPBS-xxx`)
-- [ ] Título do MR no formato `tipo(backend): descrição`
+- [ ] Branch e commits no padrão (`tipo/CPBS-xxx-descricao`, `tipo: [CPBS-xxx] ...`)
+- [ ] Título do MR no formato `tipo: [CPBS-xxx] descrição`
 - [ ] Testes escritos **antes/junto** (TDD): toda rota e mensagem WS nova/alterada tem teste de integração; casos de uso com teste unitário
 - [ ] `make lint typecheck test` verde (ruff, mypy --strict, lint-imports, pytest ≥ 90%)
 - [ ] Camadas DDD respeitadas (domínio sem FastAPI/Pydantic; presentation não acessa infrastructure direto)
@@ -78,4 +78,3 @@ CPBS-
 - [ ] Sem segredos, `print` de debug, código comentado ou TODO sem ticket
 
 /assign me
-/label ~feature ~backend

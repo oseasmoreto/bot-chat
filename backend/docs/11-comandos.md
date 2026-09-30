@@ -39,7 +39,6 @@ pip install -r requirements-test.txt
 | Alvo | O que faz |
 |------|-----------|
 | `make install` | Cria o `.venv` (se não existir) e instala `requirements-test.txt` |
-| `make setup` | `make install` + `pre-commit install` + `git config commit.template .gitmessage` |
 | `make up` | `docker compose up --build` (imagem de runtime + DynamoDB Local) |
 | `make down` | `docker compose down` |
 | `make dev` | `docker compose -f docker-compose.dev.yml up --build` (reload) |
@@ -67,6 +66,5 @@ Com o venv ativado (§1), na raiz do projeto — iguais em qualquer sistema:
 | Tipos | `mypy api tests` |
 | Fronteiras DDD | `lint-imports` |
 | Exportar OpenAPI | `python -m api.scripts.export_openapi openapi.json` |
-| Hooks de commit | `pre-commit install` |
 
 Docker e Docker Compose não dependem do venv: `docker compose up --build`, `docker compose -f docker-compose.dev.yml up --build`, `docker compose down`.

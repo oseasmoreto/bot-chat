@@ -2,7 +2,7 @@
 
 Plataforma de atendimento, via chat, de serviços de parceiros de varejo.
 
-Este repositório contém **dois projetos independentes**. Cada um tem seu próprio README, CONTRIBUTING, `.gitmessage`, documentação, ADRs, templates de MR, Dockerfile, docker compose e Makefile.
+Este repositório contém **dois projetos independentes**. Cada um tem seu próprio README, CONTRIBUTING, documentação, ADRs, templates de MR, Dockerfile, docker compose e Makefile.
 
 | Projeto | Stack | Domínio | Imagem | Documentação |
 |---------|-------|---------|--------|--------------|
@@ -41,19 +41,25 @@ cd frontend && docker compose up --build
 
 Acesse http://localhost:3000/health (web) e http://localhost:3000/admin/health (admin). Detalhes e alternativas sem Docker nos READMEs de cada projeto.
 
+## Instalando o make no Windows
+
+Os atalhos `make …` do backend (`make install`, `make dev`, `make check`) precisam do `make`:
+
+1. Abra o **PowerShell** e rode `winget install ezwinports.make` (aceite os termos com `Y`).
+2. **Feche todos os terminais** (inclusive o do VS Code) e abra o **Git Bash** de novo.
+3. Confira: `make --version`.
+4. No projeto: `cd backend && make help`.
+
+Alternativas (Chocolatey, Scoop), o que fazer se aparecer `make: command not found` e instalação no Linux/macOS: [backend/README.md — Instalando o make](./backend/README.md#instalando-o-make).
+
 ## Estrutura do repositório
 
 ```text
 bot-varejo/
 ├── README.md                 # este arquivo
 ├── CONTRIBUTING.md           # padrão de branches, commits, MRs e versionamento
-├── .gitmessage               # template de mensagem de commit
-├── commitlint.config.mjs     # regras de commit (a criar na implementação)
-├── .pre-commit-config.yaml   # hooks de commit/push e lint por projeto (a criar)
-├── scripts/
-│   └── check-branch-name.sh  # validação do nome da branch (a criar)
-├── backend/                  # projeto backend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose
-└── frontend/                 # projeto frontend — README, CONTRIBUTING, .gitmessage, .gitlab, docs, Dockerfile, compose
+├── backend/                  # projeto backend — README, CONTRIBUTING, .gitlab, docs, Dockerfile, compose, Makefile
+└── frontend/                 # projeto frontend — README, CONTRIBUTING, .gitlab, docs, Dockerfile, compose
 ```
 
 ## Contribuindo
@@ -63,9 +69,7 @@ Leia o [CONTRIBUTING.md](./CONTRIBUTING.md). Cada projeto tem também o seu guia
 ```text
 branches:  developer (development) → staging (homologação) → master (production) — todas protegidas
 branch:    feat/CPBS-123-descricao-curta  (sai da developer)
-commit:    feat(backend): adiciona health check por escopo   ← escopos: backend | frontend, web, admin | deps, repo | release
-           (linha em branco)
-           Refs: CPBS-123
+commit:    feat: [CPBS-123] adiciona health check por escopo   ← tipo: [ticket] descrição
 MR:        → developer · merge commit (sem squash) · um projeto por MR · template do projeto · validação local verde
 publicar:  MRs de promoção developer → staging → master (template Release)
 tags:      backend-vX.Y.Z · frontend-vX.Y.Z (na master)
