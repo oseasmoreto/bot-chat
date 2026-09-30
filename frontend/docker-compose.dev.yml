@@ -1,4 +1,6 @@
-# Desenvolvimento local: next dev com hot reload (src/ e public/ montados).
+# Desenvolvimento local: next dev com hot reload. O projeto inteiro é montado:
+# qualquer alteração (código, next.config.ts, tsconfig…) vale sem subir de novo.
+# Só mudanças em package.json/pnpm-lock.yaml/Dockerfile pedem: docker compose -f docker-compose.dev.yml up --build -V
 # Uso: docker compose -f docker-compose.dev.yml up --build
 # A API deve estar rodando (compose do backend) em http://localhost:8000.
 name: bot-varejo-frontend-dev
@@ -19,5 +21,6 @@ services:
       - path: .env
         required: false
     volumes:
-      - ./src:/app/src
-      - ./public:/app/public
+      - .:/app                  # projeto inteiro montado
+      - /app/node_modules       # dependências da imagem (não as do host)
+      - /app/.next              # cache/build do next dev fora do projeto

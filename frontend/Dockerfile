@@ -17,8 +17,12 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # ---------- dev (docker-compose.dev.yml) ---------------------------------------
 FROM deps AS dev
 COPY . .
+# No compose dev o projeto é montado em /app e node_modules/.next ficam em volumes anônimos.
+# Roda como `node` (uid 1000): arquivos criados no projeto (ex.: next-env.d.ts) ficam com o dono do host.
+RUN mkdir -p .next && chown -R node:node /app
+USER node
 EXPOSE 3000
-CMD ["pnpm", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["node_modules/.bin/next", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
 
 # ---------- builder ------------------------------------------------------------
 FROM deps AS builder

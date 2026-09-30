@@ -73,6 +73,7 @@ flowchart LR
    ```bash
    git config commit.template .gitmessage   # template de mensagem de commit
    corepack enable && pnpm install          # dependências
+   mkdir -p node_modules .next              # pastas de montagem do compose de dev, com o seu usuário
    pre-commit install                       # hooks: commitlint, nome da branch, prettier, eslint
    ```
 
@@ -95,7 +96,7 @@ Confira: `curl -s http://localhost:8000/api/v1/public/health` deve responder `"s
 |---------|---------------------------|---------------|
 | `bot-varejo-web` | `bot-varejo-web` / `bot-varejo-web-dev` | `3000` (`WEB_PORT`) |
 
-**Desenvolvimento** (recomendado no dia a dia) — `src/` e `public/` montados, *hot reload*:
+**Desenvolvimento** (recomendado no dia a dia) — projeto inteiro montado, *hot reload*: qualquer alteração (código, `next.config.ts`, `tsconfig.json`, CSS) aparece em ~1 s, sem subir de novo. Antes do primeiro `up`, garanta `mkdir -p node_modules .next` (passo 3 da Configuração).
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
@@ -123,7 +124,7 @@ Acrescente `-f docker-compose.dev.yml` quando estiver usando o compose de desenv
 | Ver status | `docker compose ps` |
 | Acompanhar logs | `docker compose logs -f bot-varejo-web` |
 | Parar | `docker compose down` |
-| Recriar após mudar `package.json`/`next.config.ts`/`Dockerfile` | `docker compose up --build` |
+| Recriar após mudar `package.json`/`pnpm-lock.yaml`/`Dockerfile` (código e configs não precisam) | `docker compose -f docker-compose.dev.yml up --build -V` |
 | Shell dentro do container | `docker compose exec bot-varejo-web sh` |
 
 ### URLs
@@ -165,6 +166,8 @@ pnpm openapi       # atualiza os tipos a partir do /api/openapi.json da API
 |---------|----------------|---------|
 | `permission denied … docker.sock` | Usuário fora do grupo `docker` | `sudo usermod -aG docker $USER` e abrir um novo terminal |
 | `port is already allocated` | Porta 3000 em uso | Parar o outro processo ou mudar `WEB_PORT` no `.env` |
+| `EACCES`/`permission denied` em `node_modules` ou `.next` ao rodar fora do Docker | O Docker criou as pastas de montagem como root | `docker compose -f docker-compose.dev.yml down`, `rmdir node_modules .next` (vazias) e `mkdir -p node_modules .next` |
+| Dependência nova não aparece no container | Volume de `node_modules` antigo | `docker compose -f docker-compose.dev.yml up --build -V` |
 | Erro de CORS no console | Origem do front não liberada no backend | No backend: `APP_CORS_ORIGINS='["http://localhost:3000"]'` |
 | WebSocket `closed` na tela de status | API fora do ar ou `Origin` não permitido | Subir a API; conferir `APP_CORS_ORIGINS` |
 | Erro "Variável de ambiente obrigatória não definida" | `API_URL`/`WS_URL` ausentes | Definir no `.env` ou no ambiente |

@@ -34,8 +34,12 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # ---------- dev (docker-compose.dev.yml) ---------------------------------------
 FROM deps AS dev
 COPY . .
+# No compose dev o projeto é montado em /app e node_modules/.next ficam em volumes anônimos.
+# Roda como `node` (uid 1000): arquivos criados no projeto (ex.: next-env.d.ts) ficam com o dono do host.
+RUN mkdir -p .next && chown -R node:node /app
+USER node
 EXPOSE 3000
-CMD ["pnpm", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["node_modules/.bin/next", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
 
 # ---------- builder ------------------------------------------------------------
 FROM deps AS builder
@@ -106,7 +110,9 @@ services:
 ### `docker-compose.dev.yml`
 
 ```yaml
-# Desenvolvimento local: next dev com hot reload (src/ e public/ montados).
+# Desenvolvimento local: next dev com hot reload. O projeto inteiro é montado:
+# qualquer alteração (código, next.config.ts, tsconfig…) vale sem subir de novo.
+# Só mudanças em package.json/pnpm-lock.yaml/Dockerfile pedem: docker compose -f docker-compose.dev.yml up --build -V
 # Uso: docker compose -f docker-compose.dev.yml up --build
 # A API deve estar rodando (compose do backend) em http://localhost:8000.
 name: bot-varejo-frontend-dev
@@ -127,11 +133,16 @@ services:
       - path: .env
         required: false
     volumes:
-      - ./src:/app/src
-      - ./public:/app/public
+      - .:/app                  # projeto inteiro montado
+      - /app/node_modules       # dependências da imagem (não as do host)
+      - /app/.next              # cache/build do next dev fora do projeto
 ```
 
-> Só `src/` e `public/` são montados (para não sobrescrever o `node_modules` do container). Mudou `package.json`, `next.config.ts` ou configs? Suba com `--build`.
+> **Hot reload sem subir de novo:** o projeto inteiro é montado em `/app`; `node_modules` e `.next` ficam em **volumes anônimos** (dependências da imagem, cache fora do projeto). Qualquer alteração — código, `next.config.ts`, `tsconfig.json`, CSS — chega ao `next dev` em ~1 s. O container roda como `node` (uid 1000), então arquivos gerados no projeto ficam com o dono do host.
+>
+> Só mudanças em `package.json`, `pnpm-lock.yaml` ou `Dockerfile` pedem `docker compose -f docker-compose.dev.yml up --build -V` (o `-V` recria o volume de `node_modules` com as dependências novas).
+>
+> Antes do **primeiro** `up`, crie as pastas de montagem com o seu usuário: `mkdir -p node_modules .next`. Sem isso o Docker as cria como root e o `pnpm`/`next` fora do Docker deixam de conseguir escrever nelas.
 
 ### Rodando com o backend
 

@@ -20,7 +20,7 @@ frontend/
 ├── playwright.config.ts
 ├── Dockerfile                      # multi-stage: deps, dev, builder, runtime (node:24-slim)
 ├── docker-compose.yml              # bot-varejo-web (runtime)
-├── docker-compose.dev.yml          # next dev com hot reload
+├── docker-compose.dev.yml          # next dev com hot reload (projeto montado)
 ├── Makefile
 ├── .env.example                    # todas as variáveis documentadas
 ├── .dockerignore

@@ -1,4 +1,5 @@
-# Desenvolvimento local: API com --reload (código montado) + DynamoDB Local.
+# Desenvolvimento local: API com --reload (src/ montado) + DynamoDB Local.
+# Alterações em src/ recarregam sozinhas. Só pyproject.toml/uv.lock/Dockerfile pedem --build.
 # Uso: docker compose -f docker-compose.dev.yml up --build
 name: bot-varejo-backend-dev
 

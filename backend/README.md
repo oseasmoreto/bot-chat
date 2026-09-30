@@ -74,7 +74,7 @@ O compose sobe dois serviços:
 
 ### Desenvolvimento (recomendado no dia a dia)
 
-Código de `src/` montado no container e **reload automático** a cada alteração:
+Código de `src/` montado no container: **cada alteração recarrega a API sozinha** (~2 s), sem subir de novo. Só mudar `pyproject.toml`, `uv.lock` ou `Dockerfile` pede `--build`.
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
@@ -116,7 +116,7 @@ Acrescente `-f docker-compose.dev.yml` quando estiver usando o compose de desenv
 | Acompanhar logs da API | `docker compose logs -f bot-varejo-api` |
 | Parar tudo | `docker compose down` |
 | Parar e **apagar os dados** do banco local | `docker compose down -v` |
-| Recriar após mudar `pyproject.toml`/`uv.lock`/`Dockerfile` | `docker compose up --build` |
+| Recriar após mudar `pyproject.toml`/`uv.lock`/`Dockerfile` (código em `src/` não precisa) | `docker compose up --build` |
 | Shell dentro da API | `docker compose exec bot-varejo-api sh` |
 | Listar tabelas do banco local | `aws dynamodb list-tables --endpoint-url http://localhost:8001` |
 

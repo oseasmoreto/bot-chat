@@ -19,7 +19,8 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-install-project
 ENV PATH=/app/.venv/bin:$PATH \
     PYTHONPATH=/app/src \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000
 CMD ["uvicorn", "bot_varejo.main:create_app", "--factory", "--reload", "--reload-dir", "/app/src", "--host", "0.0.0.0", "--port", "8000"]
 

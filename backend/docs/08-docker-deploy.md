@@ -35,7 +35,8 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-install-project
 ENV PATH=/app/.venv/bin:$PATH \
     PYTHONPATH=/app/src \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000
 CMD ["uvicorn", "bot_varejo.main:create_app", "--factory", "--reload", "--reload-dir", "/app/src", "--host", "0.0.0.0", "--port", "8000"]
 
@@ -141,7 +142,8 @@ volumes:
 ### `docker-compose.dev.yml`
 
 ```yaml
-# Desenvolvimento local: API com --reload (código montado) + DynamoDB Local.
+# Desenvolvimento local: API com --reload (src/ montado) + DynamoDB Local.
+# Alterações em src/ recarregam sozinhas. Só pyproject.toml/uv.lock/Dockerfile pedem --build.
 # Uso: docker compose -f docker-compose.dev.yml up --build
 name: bot-varejo-backend-dev
 
@@ -187,7 +189,7 @@ volumes:
     name: bot-varejo-dynamodb-dev-data   # nome fixo, sem prefixo do projeto compose
 ```
 
-> Mudou `pyproject.toml`/`uv.lock`? Suba de novo com `--build`.
+> **Reload sem subir de novo:** `src/` é montado no container e o Uvicorn (`--reload`, WatchFiles) reinicia sozinho a cada alteração — em ~2 s. `PYTHONDONTWRITEBYTECODE=1` evita `__pycache__` com dono root no projeto. Só mudanças em `pyproject.toml`, `uv.lock` ou `Dockerfile` pedem `docker compose -f docker-compose.dev.yml up --build`.
 
 
 ### Rodando junto com o frontend
