@@ -116,6 +116,8 @@ backend/
 | `requirements*.txt` | Dependências ([13](./13-dependencias.md)) | Libs com versão fixada | — |
 | `.github/` | Configuração do GitHub Copilot ([14](./14-ia-copilot.md)) | Instruções, prompts e agentes | Qualquer outra configuração |
 
+O que é cada arquivo dentro de um context (`entities.py`, `ports.py`, casos de uso, adapters, `schemas.py`, `http.py`…): [03 — Anatomia de um context](./03-arquitetura-ddd.md#anatomia-de-um-context).
+
 ### Onde colocar algo novo
 
 | Preciso de… | Onde |

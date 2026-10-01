@@ -12,7 +12,7 @@ API REST + WebSocket em **Python 3.13 + FastAPI**, servida em domínio próprio 
 | 00 | [Visão geral](./00-visao-geral.md) | Contexto, stack, princípios |
 | 01 | [Arquitetura](./01-arquitetura.md) | Contexto do sistema, containers, rotas, fluxos HTTP/WS, evolução |
 | 02 | [Estrutura de pastas](./02-estrutura.md) | Árvore do projeto, o que vai em cada pasta, onde colocar algo novo, arquivos gerados |
-| 03 | [Arquitetura DDD](./03-arquitetura-ddd.md) | Bounded contexts, camadas, regra de dependência, SOLID/DRY/KISS |
+| 03 | [Arquitetura DDD](./03-arquitetura-ddd.md) | Bounded contexts, camadas, anatomia de um context (o que é cada arquivo), SOLID/DRY/KISS |
 | 04 | [Context `health`](./04-context-health.md) | Código de referência completo, incluindo `app_run.py` com CORS |
 | 05 | [WebSocket](./05-websocket.md) | Validação de `Origin`, dispatcher, handlers |
 | 06 | [Contratos de API](./06-contratos-api.md) | URLs, endpoints, schemas, CORS, protocolo WS, evolução do contrato, OpenAPI |
