@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     version: str = "0.1.0"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     docs_enabled: bool = True
+    # Endereço do servidor quando sobe por `python main.py`. No container precisa escutar em
+    # todas as interfaces para receber tráfego de fora.
+    host: str = "0.0.0.0"  # noqa: S104
+    port: int = 8000
     # Origens do frontend autorizadas (CORS e handshake do WebSocket).
     # Via env, em JSON: APP_CORS_ORIGINS='["https://app.dominio.com.br"]'
     cors_origins: list[str] = ["http://localhost:3000"]

@@ -28,6 +28,7 @@ backend/
 │   ├── prompts/                 # /novo-context, /novo-modulo, /novo-endpoint, /nova-mensagem-ws, /revisar-arquitetura,
 │   │                            # /documentar, /novo-adr, /revisar-docs
 │   └── agents/                  # backend-ddd.agent.md (código) e docs-backend.agent.md (documentação)
+├── main.py                      # ponto de entrada: `python main.py` ou `uvicorn main:app`
 ├── api/                         # código da aplicação (pacote Python `api`)
 │   ├── __init__.py
 │   ├── app_run.py               # create_app(): composição, middlewares, routers, handlers de erro
@@ -82,6 +83,7 @@ backend/
     ├── conftest.py              # fixtures: settings, app, client async, ws client, ALLOWED_ORIGIN
     ├── fakes.py                 # dublês das ports: FakeClock, StubCheck
     ├── unit/
+    │   ├── test_main.py         # main.app e python main.py
     │   ├── core/                # test_config, test_dispatcher, test_logging
     │   └── contexts/health/
     │       ├── domain/          # test_entities, test_value_objects
@@ -100,6 +102,7 @@ backend/
 
 | Pasta / arquivo | Responsabilidade | Coloque aqui | Não coloque aqui |
 |-----------------|------------------|--------------|------------------|
+| `main.py` | Ponto de entrada (`app` + `run()`) | Só sobe a aplicação | Qualquer outra lógica — composição fica em `app_run.py` |
 | `api/app_run.py` | Cria a aplicação (`create_app`) | Registro de middlewares, routers e handlers de erro | Regra de negócio, configuração de rota |
 | `api/config.py` | Configuração (`Settings`) | Toda variável `APP_*` nova, com tipo e padrão | Leitura de `os.environ` espalhada pelo código |
 | `api/container.py` | *Composition root* | Instanciar adapters e casos de uso, registrar handlers WS | Lógica — só montagem |

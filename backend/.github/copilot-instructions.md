@@ -11,6 +11,7 @@ Toda tarefa que **cria ou altera** comportamento (context, módulo, endpoint, me
 ## Estrutura
 
 ```text
+main.py               # ponto de entrada: `python main.py` ou `uvicorn main:app` — só sobe a aplicação
 api/
 ├── app_run.py        # create_app(): middlewares, routers, handlers de erro
 ├── config.py         # Settings (pydantic-settings, variáveis APP_*)
@@ -75,7 +76,7 @@ Sem `make`, com o venv ativado (`source .venv/bin/activate` no Linux/macOS, `sou
 
 ```bash
 ruff format . && ruff check --fix .
-mypy api tests
+mypy main.py api tests
 lint-imports
 coverage run -m pytest && coverage report
 python -m api.scripts.export_openapi openapi.json   # se o contrato HTTP mudou
@@ -85,7 +86,7 @@ Sem ambiente Python local, pela imagem de dev (`docker compose -f docker-compose
 
 ```bash
 docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/app -w /app bot-varejo-api:dev \
-  sh -c 'ruff format . && ruff check --fix . && mypy api tests && lint-imports && coverage run -m pytest && coverage report'
+  sh -c 'ruff format . && ruff check --fix . && mypy main.py api tests && lint-imports && coverage run -m pytest && coverage report'
 ```
 
 ## Documentação

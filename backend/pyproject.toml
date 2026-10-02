@@ -33,7 +33,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["api"]
+source = ["api", "main"]
 branch = true
 
 [tool.coverage.report]

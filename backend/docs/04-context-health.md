@@ -322,6 +322,36 @@ admin_router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 admin_router.include_router(build_health_router(Scope.ADMIN))
 ```
 
+## `main.py`
+
+Ponto de entrada na raiz do projeto. Atende os dois jeitos de subir a aplicação: `python main.py` (usado pela imagem de produção) e `uvicorn main:app` (usado no dev, com `--reload`).
+
+```python
+"""Ponto de entrada da aplicação.
+
+- `python main.py` sobe o Uvicorn em `APP_HOST`:`APP_PORT` (padrão 0.0.0.0:8000).
+- `uvicorn main:app` (ou outro servidor ASGI) usa o objeto `app`.
+"""
+
+import uvicorn
+
+from api.app_run import create_app
+from api.config import Settings
+
+settings = Settings()
+app = create_app(settings)
+
+
+def run() -> None:
+    # log_config=None: o Uvicorn mantém o log JSON configurado por create_app.
+    # X-Forwarded-* só é aceito dos IPs em FORWARDED_ALLOW_IPS (lido pelo Uvicorn).
+    uvicorn.run(app, host=settings.host, port=settings.port, proxy_headers=True, log_config=None)
+
+
+if __name__ == "__main__":
+    run()
+```
+
 ## `app_run.py`
 
 ```python
@@ -357,7 +387,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 ```
 
-Execução: `uvicorn api.app_run:create_app --factory --host 0.0.0.0 --port 8000`.
+`create_app` monta a aplicação; quem a executa é o [`main.py`](#mainpy).
 
 ## `core/cors.py`
 
@@ -420,6 +450,10 @@ class Settings(BaseSettings):
     version: str = "0.1.0"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     docs_enabled: bool = True
+    # Endereço do servidor quando sobe por `python main.py`. No container precisa escutar em
+    # todas as interfaces para receber tráfego de fora.
+    host: str = "0.0.0.0"  # noqa: S104
+    port: int = 8000
     # Origens do frontend autorizadas (CORS e handshake do WebSocket).
     # Via env, em JSON: APP_CORS_ORIGINS='["https://app.dominio.com.br"]'
     cors_origins: list[str] = ["http://localhost:3000"]

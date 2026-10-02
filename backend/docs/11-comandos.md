@@ -45,7 +45,7 @@ pip install -r requirements-test.txt
 | `make run` | API fora do Docker com reload (banco em `localhost:8001`) |
 | `make lint` | `ruff check` + `ruff format --check` + `lint-imports` |
 | `make format` | `ruff format` + `ruff check --fix` |
-| `make typecheck` | `mypy api tests` |
+| `make typecheck` | `mypy main.py api tests` |
 | `make test` | `coverage run -m pytest` + `coverage report` (mínimo 90%) |
 | `make check` | `lint` + `typecheck` + `test` — validação completa antes de abrir o MR |
 | `make openapi` | Atualiza o `openapi.json` versionado |
@@ -59,11 +59,11 @@ Com o venv ativado (§1), na raiz do projeto — iguais em qualquer sistema:
 
 | Ação | Comando |
 |------|---------|
-| Rodar a API fora do Docker | `uvicorn api.app_run:create_app --factory --reload --port 8000` (banco: `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001` no `.env`) |
+| Rodar a API fora do Docker | `uvicorn main:app --reload --reload-dir api --port 8000` ou `python main.py` (sem reload); banco: `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001` no `.env` |
 | Testes + cobertura | `coverage run -m pytest` e depois `coverage report` |
 | Lint | `ruff check .` |
 | Formatar | `ruff format .` |
-| Tipos | `mypy api tests` |
+| Tipos | `mypy main.py api tests` |
 | Fronteiras DDD | `lint-imports` |
 | Exportar OpenAPI | `python -m api.scripts.export_openapi openapi.json` |
 

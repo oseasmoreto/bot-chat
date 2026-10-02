@@ -32,7 +32,7 @@ dev: ## Sobe a API com reload + DynamoDB Local
 
 run: ## Roda a API fora do Docker (banco em localhost:8001)
 	APP_DYNAMODB_ENDPOINT_URL=$${APP_DYNAMODB_ENDPOINT_URL:-http://localhost:8001} \
-		$(BIN)/uvicorn api.app_run:create_app --factory --reload --port 8000
+		$(BIN)/uvicorn main:app --reload --reload-dir api --port 8000
 
 test: ## Testes com cobertura (mínimo 90%)
 	$(BIN)/coverage run -m pytest
@@ -48,7 +48,7 @@ format: ## Formata e aplica correções automáticas
 	$(BIN)/ruff check --fix .
 
 typecheck: ## mypy --strict
-	$(BIN)/mypy api tests
+	$(BIN)/mypy main.py api tests
 
 check: lint typecheck test ## Validação completa: lint, tipos e testes
 

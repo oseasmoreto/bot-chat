@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements-test.
 ENV PYTHONPATH=/app \
     PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000
-CMD ["uvicorn", "api.app_run:create_app", "--factory", "--reload", "--reload-dir", "/app/api", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--reload", "--reload-dir", "/app/api", "--host", "0.0.0.0", "--port", "8000"]
 
 # ---------- builder ------------------------------------------------------------
 FROM base AS builder
@@ -52,14 +52,15 @@ RUN useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
 # Código e dependências ficam com dono root: o usuário da aplicação só lê.
 COPY --from=builder /app/.venv /app/.venv
+COPY main.py ./
 COPY api ./api
-RUN python -m compileall -q api
+RUN python -m compileall -q main.py api
 
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/public/health', timeout=2)"]
-CMD ["uvicorn", "api.app_run:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["python", "main.py"]
 ```
 
 Pontos importantes:
@@ -68,7 +69,8 @@ Pontos importantes:
 - **Não-root** (`app`, uid 10001). Código (`api/`) e `.venv` ficam com dono root: a aplicação só lê. O bytecode é gerado no build (`compileall`).
 - Só `api/` e as dependências de runtime (`requirements.txt`) entram na imagem; testes e ferramentas de qualidade ficam no estágio `dev`.
 - Cache do pip montado no build (`--mount=type=cache`): rebuild só baixa o que mudou em `requirements*.txt`.
-- `--proxy-headers` + `FORWARDED_ALLOW_IPS`: o Uvicorn só confia em `X-Forwarded-*` vindos desses IPs. Em produção, configure com o IP/rede do load balancer (ou `*` se o container só for acessível pela rede privada).
+- **Entrada pelo `main.py`:** a imagem de produção roda `python main.py` (Uvicorn com `proxy_headers` ligado); o dev roda `uvicorn main:app --reload`. Os dois usam o mesmo `app` ([04](./04-context-health.md#mainpy)).
+- `proxy_headers` + `FORWARDED_ALLOW_IPS`: o Uvicorn só confia em `X-Forwarded-*` vindos desses IPs. Em produção, configure com o IP/rede do load balancer (ou `*` se o container só for acessível pela rede privada).
 - **1 processo Uvicorn** por container; escalar = mais réplicas. WebSocket com estado entre réplicas exigirá *pub/sub* (futuro).
 - `.dockerignore`: `.venv`, caches, relatórios de teste, `docs/`, `tests/`, `.env*` (exceto `.env.example`) e os próprios arquivos Docker.
 - Versões fixadas: dependências em `requirements*.txt` e `amazon/dynamodb-local` no compose.
@@ -155,6 +157,7 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
+      - ./main.py:/app/main.py
       - ./api:/app/api
     environment:
       APP_ENV: local
@@ -223,6 +226,8 @@ Documentadas também em `.env.example`.
 | `APP_LOG_LEVEL` | `INFO` | `DEBUG` · `INFO` · `WARNING` · `ERROR` |
 | `APP_DOCS_ENABLED` | `true` | Liga `/api/docs`, `/api/redoc`, `/api/openapi.json` |
 | `APP_CORS_ORIGINS` | `["http://localhost:3000"]` | Origens do frontend (JSON). Vale para CORS e para o `Origin` do WebSocket |
+| `APP_HOST` | `0.0.0.0` | Interface em que `python main.py` escuta |
+| `APP_PORT` | `8000` | Porta em que `python main.py` escuta. Nos compose e no HEALTHCHECK a porta interna é 8000 — mude a porta do host com `API_PORT` |
 | `FORWARDED_ALLOW_IPS` | `127.0.0.1` | IPs de proxy confiáveis para `X-Forwarded-*` (lido pelo Uvicorn) |
 | `API_PORT` | `8000` | Porta publicada no host (compose) |
 | `APP_AWS_REGION` | `sa-east-1` | Região do DynamoDB ([12](./12-persistencia-dynamodb.md#6-configuração)) |

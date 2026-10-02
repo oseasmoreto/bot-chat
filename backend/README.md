@@ -171,7 +171,7 @@ docker compose -f docker-compose.dev.yml up -d bot-varejo-dynamodb
 make run
 ```
 
-Sem `make`: coloque `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001` no `.env` e, com o venv ativado, rode `uvicorn api.app_run:create_app --factory --reload --port 8000`.
+Sem `make`: coloque `APP_DYNAMODB_ENDPOINT_URL=http://localhost:8001` no `.env` e, com o venv ativado, rode `uvicorn main:app --reload --reload-dir api --port 8000` (ou `python main.py`, sem reload).
 
 ### Tabelas do banco
 
@@ -258,7 +258,7 @@ Sem `make`, com o venv ativado, na raiz do projeto:
 coverage run -m pytest && coverage report   # testes + cobertura (≥ 90%) + contrato OpenAPI
 ruff check .                                # lint
 ruff format .                               # formatação
-mypy api tests                              # tipos (--strict)
+mypy main.py api tests                      # tipos (--strict)
 lint-imports                                # fronteiras das camadas DDD
 python -m api.scripts.export_openapi openapi.json   # atualiza o contrato
 ```
@@ -274,6 +274,7 @@ Os testes de integração dos repositórios usam o DynamoDB Local: deixe `bot-va
 | `APP_LOG_LEVEL` | `INFO` | Nível de log |
 | `APP_DOCS_ENABLED` | `true` | Habilita Swagger/OpenAPI |
 | `APP_CORS_ORIGINS` | `["http://localhost:3000"]` | Origens do frontend (JSON) — CORS e WebSocket |
+| `APP_HOST` / `APP_PORT` | `0.0.0.0` / `8000` | Onde `python main.py` escuta (dentro do container, mantenha 8000) |
 | `FORWARDED_ALLOW_IPS` | `127.0.0.1` | Proxies confiáveis (`X-Forwarded-*`) |
 | `API_PORT` | `8000` | Porta publicada no host |
 | `APP_AWS_REGION` | `sa-east-1` | Região do DynamoDB |

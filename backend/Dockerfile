@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements-test.
 ENV PYTHONPATH=/app \
     PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000
-CMD ["uvicorn", "api.app_run:create_app", "--factory", "--reload", "--reload-dir", "/app/api", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--reload", "--reload-dir", "/app/api", "--host", "0.0.0.0", "--port", "8000"]
 
 # ---------- builder ------------------------------------------------------------
 FROM base AS builder
@@ -36,11 +36,12 @@ RUN useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
 # Código e dependências ficam com dono root: o usuário da aplicação só lê.
 COPY --from=builder /app/.venv /app/.venv
+COPY main.py ./
 COPY api ./api
-RUN python -m compileall -q api
+RUN python -m compileall -q main.py api
 
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/public/health', timeout=2)"]
-CMD ["uvicorn", "api.app_run:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["python", "main.py"]

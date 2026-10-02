@@ -13,6 +13,7 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
+      - ./main.py:/app/main.py
       - ./api:/app/api
     environment:
       APP_ENV: local

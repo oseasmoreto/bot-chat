@@ -1,5 +1,5 @@
 ---
-applyTo: "api/core/**,api/app_run.py,api/config.py,api/container.py"
+applyTo: "main.py,api/core/**,api/app_run.py,api/config.py,api/container.py"
 description: "Shared kernel (api/core), composição da aplicação, configuração e container"
 ---
 
@@ -11,5 +11,6 @@ description: "Shared kernel (api/core), composição da aplicação, configuraç
 - Middleware novo: ASGI puro (não `BaseHTTPMiddleware`) para valer também no WebSocket; registrado em `app_run.py` respeitando a ordem (o último `add_middleware` é o mais externo).
 - `config.py`: variável nova = campo tipado no `Settings` com padrão seguro para local (`APP_<NOME>`), documentada em `.env.example` e em `docs/08-docker.md` (§4). Segredo sem valor padrão.
 - `container.py` é o **único** lugar que instancia adapters e casos de uso: adicione o campo ao `Container` e monte em `build_container(settings)`. Recursos com ciclo de vida (clientes HTTP, DynamoDB) abrem/fecham no `lifespan` de `app_run.py`.
+- `main.py` (raiz) só sobe a aplicação: expõe `app` e `run()` (`python main.py`). Nada de rota, middleware ou regra ali.
 - `app_run.py` só compõe: middlewares, `include_router`, handlers de erro. Nada de rota ou regra aqui.
 - Mudou algo aqui? Teste em `tests/unit/core/` ou `tests/integration/api/`.
